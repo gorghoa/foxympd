@@ -1,0 +1,26 @@
+{
+  "version": "0.0.2",
+  "name": "FoxyMPD",
+  "default_locale": "en",
+  "locales": {
+    "en": {
+      "name": "FoxyMPD",
+      "description": "mpd client for firefox os"
+    }
+  },
+  "description": "mpd client for firefox os",
+  "launch_path" : "/index.html",
+  "icons": {
+    "16": "/imgs/icon-16.png",
+    "48": "/imgs/icon-48.png",
+    "128": "/imgs/icon-128.png"
+  },
+  "permissions" : {
+        "tcp-socket": {"description":"needed for connection to mpd server"}
+  },
+  "type": "privileged",
+  "developer": {
+    "name": "barosofts",
+    "url": "https://github.com/gorghoa/foxympd"
+  }
+}

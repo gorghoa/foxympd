@@ -1,0 +1,13 @@
+*.aux
+*.idx
+*.log
+*.toc
+*~
+*.swp
+*.orig
+.hgignore
+.hg
+*.bdd
+_build
+*.sass-cache
+
