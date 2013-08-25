@@ -1,0 +1,182 @@
+html {
+    font: normal 18px "mozTT", sans-serif;
+}
+
+p {
+    line-height:1.5em;
+    text-align:center;
+}
+
+p a {
+    text-decoration:underline;
+}
+
+
+button:active {
+  background-color: #008AAA;
+}
+
+li.active {
+  background-color: #008AAA;
+}
+
+a,a:visited,a:hover {
+    color:#000;
+}
+
+a:active {
+    background-color:#008AAA;
+}
+
+a .lsf.icon {
+    display:inline-block;
+    width:2rem;
+    text-align: center;
+}
+
+a[role=button] {
+    display:inline-block;
+    padding:5px;
+    width:100%;
+}
+
+form {
+    text-align:center;
+}
+
+input {
+    display:inline-block;
+    background:#EEE;
+    width:80%;
+    padding:5px;
+    border:1px solid #123;
+    margin:5px;
+}
+
+
+li.list {
+    margin:5px;
+    border-bottom:1px solid #CCC;
+    white-space: nowrap;
+    overflow:hidden;
+    text-overflow: ellipsis;
+    padding:0.3rem 0;
+}
+li.list .title {
+    margin-bottom:2px;
+
+}
+li.list .title:before {
+    display:inline-block;
+    color:orange;
+    content:"circle ";
+    font-family:"LigatureSymbols";
+    width:0.8rem;
+
+}
+
+li.list.current:before {
+    display:block;
+    position:absolute;
+    content:'spark';
+    font-family:"LigatureSymbols";
+    left:0rem;
+    font-size:2rem;
+
+}
+li.list.current .title:before {
+        content:"";
+}
+
+li.list .artist {
+    font-size:0.8rem;
+    color:#555;
+    padding-left:0.4rem;
+}
+
+p.info:before, p.help:before {
+    font-family:"LigatureSymbols";
+    font-size:1rem;
+}
+
+p.info:before {
+    content:'info  ';
+}
+p.help:before {
+    content:'help  ';
+}
+
+
+
+p.info, p.help {
+    color:$help_color;
+    text-align:center;
+    font-size:0.8rem;
+}
+
+    
+
+h1.last {
+
+    color:$help_color;
+}
+
+li[role=artist] {
+    text-align:left;
+
+}
+
+li[role=artist].selected {
+    background:#123;
+    color:#FFF;
+}
+
+
+section[role=filters] {
+    position:fixed;
+    bottom:4rem;
+    left:0;
+    background:red;
+    width:100%;
+    background:#AAA;
+    font-style:italic;
+    text-align:center;
+    
+    ul {
+        text-align:center;
+        width:100%;
+    }
+    li {
+        padding:0.4rem;
+        text-align:center;
+        display:inline-block;
+    }
+}
+
+form[role=search] input {
+    text-align:left;
+}
+form[role=search] input {
+    text-align:center;
+    border:1px solid #789;
+    display:inline;
+}
+form[role=search] input {
+    width:70%;
+}
+form[role=search] input[type=submit] {
+    width:2rem;
+    display:inline;
+}
+
+.fifty {
+    display:inline-block;
+    width:49%;
+}
+
+section[role=main] h1 {
+    margin-top:1rem;
+    border-bottom:1px solid orange;
+    text-align:left;
+    font-size:1.2rem;
+}
