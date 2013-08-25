@@ -10,4 +10,6 @@
 *.bdd
 _build
 *.sass-cache
-
+*.zip
+build/*
+node_modules
