@@ -69,30 +69,29 @@ require([
     'backbone',
     'app',
     'views/controls',
-    'views/header'
-],function($,_,Backbone,App, ControlsView, HeaderView) {
+    'views/header',
+    'router',
+    'appmanager'
+],function($,_,Backbone,App, ControlsView, HeaderView,Router,AppManager) {
 
 
+        var promise = App.initialize();
 
-        App.initialize();
 
-        App.headerView = new  HeaderView();
-        App.headerView.render();
+        promise.always(function() {
 
-        App.toolbarView = new ControlsView();
-        App.toolbarView.render();
+            App.headerView = new  HeaderView();
+            App.headerView.render();
 
-        App.beginRouting();
+            App.toolbarView = new ControlsView();
+            App.toolbarView.render();
 
-        window.addEventListener('home',function(e) {
-            console.log('home !');
+            //            App.beginRouting();
+            App.registry.app_router= new Router.AppRouter();
+            App.registry.app_router.appManager=new AppManager();
+            Router.initialize(App.registry.app_router);
+
         });
-
-        window.addEventListener('volumedown',function(e) {
-            console.log('volume down !');
-        });
-        window.addEventListener('volumeup',function(e) {
-            console.log('volume up !');
-        });
+                        //registry.app_router.navigate('/connections/add');//,{trigger:true}); 
 
 });

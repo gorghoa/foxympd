@@ -46,7 +46,7 @@ define([
             playlists.fetch({
                 success: function(datum) {
                     if(datum) {
-                        self.$el.html(_.template(tpl,{datum:datum}));
+                        self.$el.html(tpl({datum:datum}));
                     }
                 }
             });

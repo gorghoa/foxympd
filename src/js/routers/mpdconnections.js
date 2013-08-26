@@ -22,10 +22,16 @@ define([
     'backbone',
 
     //plugins
-    'backbone.subroute'
+    'backbone.subroute',
 
-], function($,_,Backbone) {
+    'views/mpdconnections/edit',
+    'views/mpdconnections/list'
 
+
+], function($,_,Backbone,editView,listView) {
+
+
+    var view;
     var router = Backbone.SubRoute.extend({
         
         appManager:null,
@@ -39,18 +45,14 @@ define([
 
         edit : function() {
             var self=this;
-            require(['views/mpdconnections/edit'], function (View) {
-                var view = new View();
-                self.appManager.showView(view);
-              });  
+            view = new editView();
+            self.appManager.showView(view);
         },
 
         list : function() {
             var self=this;
-            require(['views/mpdconnections/list'], function (View) {
-                var view = new View();
-                self.appManager.showView(view);
-              });  
+            view = new listView();
+            self.appManager.showView(view);
         }
 
     });

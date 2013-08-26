@@ -55,7 +55,7 @@ define([
                 done = $('<a id="done" class="lsf">ok</a>');
                 done.click(function() {self.save();});
                 app.headerView.setActionButtons([done]);
-                this.$el.html(_.template(tplEdit,data));
+                this.$el.html(tplEdit(data));
                 return;
             } 
 
@@ -72,7 +72,7 @@ define([
 
             /*timetools.run_tests();*/
             data.lasttimewas = date.getTime() - this.model.get('last_connection');
-            this.$el.html(_.template(tplInfo,data));
+            this.$el.html(tplInfo(data));
 
         },
         events:{

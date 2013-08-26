@@ -33,7 +33,7 @@ define([
             var self=this;
 
             var data={isRepeat:app.registry.mpd.isRepeat(),isRandom:app.registry.mpd.isRandom()};
-            this.$el.html(_.template(tpl,data));
+            this.$el.html(tpl(data));
 
             this.$el.find('button').click(function(e) { self.mpd_action(e);});
 

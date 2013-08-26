@@ -39,7 +39,7 @@ define([
 
 
             var data={};
-            this.$el.html(_.template(tpl,data));
+            this.$el.html(tpl(data));
 
 
             this.playingoptionsView.$el=this.$el.find('#playingoptions');

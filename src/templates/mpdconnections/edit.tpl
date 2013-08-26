@@ -6,10 +6,6 @@
 <% } %>
 <form >
     <div>
-        <label for="name">name</label>
-        <input type="text"  name="name" id="name" value="<%= model.get('name') || 'coin< coin<' %>" />
-    </div>
-    <div>
         <label for="host">host</label>
         <input type="text"  name="host" id="host" value="<%= model.get('host') || '192.168.' %>" />
     </div>
@@ -21,7 +17,10 @@
         <label for="password">password</label>
         <input type="password"  name="password" id="password" value="<%= model.get('password') || "" %>"  />
     </div>
-
+    <div>
+        <label for="name">name</label>
+        <input type="text"  name="name" id="name" value="<%= model.get('name') || 'coin' %>" />
+    </div>
 </form>
 
 

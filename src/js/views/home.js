@@ -29,13 +29,10 @@ define([
     'views/playlists/storedplaylists',
 
     'tpl!templates/playlist/list',
-    'tpl!templates/mpdfetching',
-    'tpl!templates/currentSong'
+    'tpl!templates/mpdfetching'
 
+],function($,_,Backbone, timetools, app, PlaylistCollection, StoredPlaylistView, tpl,mpdfetchingTpl) {
 
-
-
-],function($,_,Backbone, timetools, app, PlaylistCollection, StoredPlaylistView, tpl,mpdfetchingTpl,currentSongTpl) {
 
 
     var homeView = Backbone.View.extend({
@@ -61,13 +58,13 @@ define([
             var data={};
             var rendered_connections = $('<ul/>');
 
-            self.$el.html(_.template(mpdfetchingTpl,{message:'opening current playlist'}));
+            self.$el.html(mpdfetchingTpl({message:'opening current playlist'}));
 
             playlist.fetch({
                 success: function(datum) {
                     if(datum) {
 
-                        self.$el.html(_.template(tpl,{datum:datum,timetools:timetools}));
+                        self.$el.html(tpl({datum:datum,timetools:timetools}));
 
                         if(!datum.size()) {
                             var v = new StoredPlaylistView();

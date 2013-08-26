@@ -57,7 +57,7 @@ define([
                         rendered_connections.append(tmpview.el);
                     });
 
-                    self.$el.html(_.template(tpl,data));
+                    self.$el.html(tpl(data));
                     self.$el.append(rendered_connections);
                 }
             

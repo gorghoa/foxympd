@@ -26,6 +26,7 @@ define([
     'collections/artists',
 
     'tpl!templates/playlist/artists',
+    'tpl!templates/playlist/roledata',
 
     'views/playlists/artists_detail'
 
@@ -65,7 +66,7 @@ define([
                     el=$('<ul/>');
                     keys[keys.length]=first;
                     last = first;
-                    roledata.append(_.template('<a name="goto-<%= last %>"></a><h1 class="last"><%=last%></h1>',{last:last}));
+                    roledata.append(tplRoledata({last:last}));
                 }
 
                 el.append(view.render());
@@ -84,7 +85,7 @@ define([
 
             app.registry.mpd.stats().then(function(result) {
 
-                self.$el.html(_.template(tplArtist,{size:result.data.artists}));
+                self.$el.html(tplArtist({size:result.data.artists}));
                 
             }).done(function() {
                 coll.fetch({

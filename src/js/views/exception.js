@@ -31,7 +31,7 @@ define([
         render: function() {
             var done = $('<a href="#" role="button">home</a>');
             app.headerView.setActionButtons([done]);
-            this.$el.html(_.template(tpl,{model:this.model}));
+            this.$el.html(tpl({model:this.model}));
             app.headerView.setTitle('Error Occured');
             console.error(this.model.get('raw_exception'));
         }

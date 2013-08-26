@@ -35,7 +35,7 @@ define([
 
             var manifest = JSON.parse(mnf);
             console.log(manifest);
-            this.$el.html(_.template(tpl,{manifest:manifest}));
+            this.$el.html(tpl({manifest:manifest}));
         }
     });
 

@@ -26,10 +26,11 @@ define([
     'collections/albums',
 
     'tpl!templates/playlist/artists',
+    'tpl!templates/playlist/roledata',
 
     'views/playlists/albums_detail'
 
-],function($,_,Backbone,app,AlbumCollection,tplAlbum,detailedAlbumView) {
+],function($,_,Backbone,app,AlbumCollection,tplAlbum,tplRoleData,detailedAlbumView) {
 
 
     var view = Backbone.View.extend({
@@ -65,7 +66,7 @@ define([
                     el=$('<ul/>');
                     keys[keys.length]=first;
                     last = first;
-                    roledata.append(_.template('<a name="goto-<%= last %>"></a><h1 class="last"><%=last%></h1><hr/>',{last:last}));
+                    roledata.append(tplRoleData({last:last}));
                 }
 
                 el.append(view.render());
@@ -84,7 +85,7 @@ define([
 
             app.registry.mpd.stats().then(function(result) {
 
-                self.$el.html(_.template(tplAlbum,{size:result.data.albums}));
+                self.$el.html(tplAlbum({size:result.data.albums}));
                 
             }).done(function() {
                 coll.fetch({

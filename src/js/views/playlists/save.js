@@ -35,7 +35,7 @@ define([
         },
         render: function() {
             var self=this;
-            self.$el.html(_.template(tpl,{}));
+            self.$el.html(tpl({}));
         },
         events: {
             "submit form":'savePlaylist'

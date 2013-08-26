@@ -54,7 +54,6 @@ define([
             var data={};
             var re=tpl(data);
 
-            console.log(re);
             this.$el.html(re);
             this.updateTitles();
 

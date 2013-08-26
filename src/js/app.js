@@ -20,24 +20,17 @@ define([
     'jquery',
     'underscore',
     'backbone',
-    'router',
-
-    
 
     'libs/mpd',
 
-
     'appmanager',
+
+    'collections/mpdconnections',
 
     //plugins
     'backbone.subroute'
 
-], function($,_,Backbone,Router,MPD,AppManager) {
-
-        var isSocket=TCPSocket||mozTCPSocket;
-        if(!isSocket) {
-            alert('pas la techno nécessaire.');
-        }
+], function($,_,Backbone,MPD,AppManager,MPDConnectionCollection) {
 
 
     var registry={
@@ -50,9 +43,6 @@ define([
     var toolbarView={};
     var headerView={};
 
-    var beginRouting=function() {
-        Router.initialize(registry.app_router);
-    };
 
     var visibilityAction=function() {
         var prom;
@@ -88,22 +78,28 @@ define([
     };
 
     var initialize=function() {
+
+
+
+        var dfd= $.Deferred();
+
+
         registry.mpd=new MPD();
 
         registry.event_manager = {};
         _.extend(registry.event_manager,Backbone.Events);
 
-        registry.app_router= new Router.AppRouter();
-        registry.app_router.appManager=new AppManager();
 
         registry.mpd.on('close',function() {
                                         clearInterval(registry.app_ticker);
                             });
 
         registry.mpd.on('open',function() {
-                                        registry.app_ticker = setInterval(function() {
-                                            registry.event_manager.trigger('tick');
-                                    },1000);
+                            console.log('CONNECT!!!');
+                            registry.mpd.run();
+                            registry.app_ticker = setInterval(function() {
+                                registry.event_manager.trigger('tick');
+                            },1000);
                 });
 
 
@@ -113,7 +109,17 @@ define([
         });
 
 
-        mpdconnect();
+        var conn = mpdconnect();
+
+        conn.done(function() {
+            dfd.resolve();
+        });
+        
+        conn.fail(function() {
+            dfd.reject(); 
+        });
+
+        return dfd.promise();
         
 
     };
@@ -121,39 +127,50 @@ define([
     var mpdconnect=function() {
 
         
+        var dfd = $.Deferred();
+
+        if(typeof TCPSocket === 'undefined' && typeof mozTCPSocket === 'undefined') {
+            dfd.reject();
+            return dfd.promise();
+        }
 
         var mpd=registry.mpd;
-        require(['collections/mpdconnections'], function(MPDConnectionCollection) {
-            try{
-                coll = new MPDConnectionCollection;
-                coll.comparator = function(model,model2) {
-                     return (model.get('last_connection') > model2.get('last_connection'))?1:-1;
-                };
-                coll.fetch({
-                   success:function(data)  {
-                    model=data.last();
+        try{
+            coll = new MPDConnectionCollection;
+            coll.comparator = function(model,model2) {
+                 return (model.get('last_connection') > model2.get('last_connection'))?1:-1;
+            };
+            coll.fetch({
+               success:function(data)  {
 
-                    if(!model) {
-                        registry.app_router.navigate('/connections/add',{trigger:true}); 
-                        return;
-                    }
+                model=data.last();
 
-                    mpd.once('open',function() {
-                        mpd.stats().done(function(result) {
-                            var stats=result.data;
-                            model.set('stats',stats);
-                            model.set('last_connection',new Date().getTime());
-                            model.save();
-                        });
+                if(!model) {
+                    dfd.reject();
+                    return;
+                }
+
+
+                mpd.once('open',function() {
+                    mpd.stats().done(function(result) {
+                        var stats=result.data;
+                        model.set('stats',stats);
+                        model.set('last_connection',new Date().getTime());
+                        model.save();
                     });
-                    mpd.setConnectInfos(model.attributes);
-                    mpd.run();
-                   }
                 });
-            } catch (e) {
+                mpd.setConnectInfos(model.attributes);
+                mpd.connect();
+                dfd.resolve();
+               }
+            });
+        } catch (e) {
                 console.error(e);
+                dfd.reject();
             }
-        });
+
+
+            return dfd.promise();
 
     };
 
@@ -162,7 +179,7 @@ define([
         registry:registry,
         headerView:headerView,
         toolbarView:toolbarView,
-        beginRouting:beginRouting,
+        /*beginRouting:beginRouting,*/
         mpdconnect:mpdconnect
     };
 

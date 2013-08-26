@@ -27,6 +27,7 @@
 
     var TCPSocket = navigator.mozTCPSocket;
 
+
     var mpd = function() {
        this.eventManager={};
         _.extend(this.eventManager,Backbone.Events);
@@ -109,6 +110,7 @@
         connect:function(connect_infos) {
             var dfd = $.Deferred();
 
+
             if(!TCPSocket) {
                 dfd.reject("TCPSocket not available with this browser."); 
                 return dfd;
@@ -151,9 +153,8 @@
                 if(password) {
                     self.stacked_mpd_commands = _.union([{command:"password "+password+"\n",parse:false,dfd:$.Deferred()}],self.stacked_mpd_commands);
                 }
-                self.eventManager.trigger('open');
-                self.run();
                 dfd.resolve();
+                self.eventManager.trigger('open');
             };
 
             this.socket.onclose=function() {
@@ -187,18 +188,24 @@
             return dfd.promise();
         },
         run:function() {
+
             var self=this;
 
             //if a mpd command is already running, or nothing less to do, we get out of here as quickly as we came in.
+
+
             if(self.runstatus !=='idle' || !_.size(self.stacked_mpd_commands)) return;
+
+
+
+            if(typeof self.socket === 'undefined' || self.socket.readyState !== 'open' ) {
+
+                return ;
+            }
 
             self.runstatus='running';
 
 
-            if(self.socket === undefined || self.socket.readyState !== 'open' ) {
-                    self.connect(self.connect_infos);
-                return;
-            }
 
             var action = _.first(self.stacked_mpd_commands);
 
@@ -249,7 +256,6 @@
 
 
         send:function(actionString,parse) {
-            
 
             var dfd = $.Deferred();
 

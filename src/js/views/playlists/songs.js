@@ -26,10 +26,11 @@ define([
     'collections/songs',
 
     'tpl!templates/playlist/artists',
+    'tpl!templates/playlist/roledata',
 
     'views/playlists/song_detail'
 
-],function($,_,Backbone,app,SongCollection,tpl,detailedView) {
+],function($,_,Backbone,app,SongCollection,tpl,tplRoledata, detailedView) {
 
 
     var view = Backbone.View.extend({
@@ -44,7 +45,7 @@ define([
             var last=null,first,init,keys=[],view,percent=0,i=0,size=_.size(data),inter;
             el = $('<div/>');
 
-            this.$el.html(_.template(tpl,{size:_.size(data)}));
+            this.$el.html(tpl({size:_.size(data)}));
 
             var roledata=this.$el.children('[role=data]');
             roledata.empty();
@@ -66,7 +67,7 @@ define([
                     last = first;
                     el.append(divArtist);
                     divArtist=$('<div class="artist" />');
-                    divArtist.append(_.template('<a name="goto-<%= last %>"></a><h1 class="last"><%=last%></h1><hr/>',{last:last}));
+                    divArtist.append(tplRoledata({last:last}));
                 }
 
                 divArtist.append(view.render());
@@ -86,7 +87,7 @@ define([
 
             app.registry.mpd.stats().then(function(result) {
 
-                self.$el.html(_.template(tpl,{size:'~'}));
+                self.$el.html(tpl({size:'~'}));
                 
             });
 

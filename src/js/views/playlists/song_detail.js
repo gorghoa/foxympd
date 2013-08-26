@@ -38,7 +38,7 @@ define([
 
         
         render:function() {
-           this.$el.html(_.template(tplData,{item:this.model}));
+           this.$el.html(tplData({item:this.model}));
            return this.$el;
         },
 

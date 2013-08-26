@@ -65,7 +65,9 @@ define([
             app.headerView.setActionButtons([done]);
 
             app.headerView.setTitle('Build a playlist');
-            this.$el.html(_.template(tplMain,{current_view:this.current_view}));
+
+
+            this.$el.html(tplMain({current_view:this.current_view}));
              
             this.changeView('artists',function(view) {
                $('div[role=items]').html(view.render());
