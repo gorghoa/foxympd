@@ -3011,7 +3011,6 @@ define("backbone", ["jquery","underscore"], (function (global) {
 
 
                 if(result.data.match(/OK\n$/)) {
-
                     console.log("idledata",self.idledata);
                     self.manageIdleData(self.idledata);
                     self.status();
@@ -3063,7 +3062,7 @@ define("backbone", ["jquery","underscore"], (function (global) {
 
 
 
-            var error_regexp = new RegExp('ACK');
+            var error_regexp = new RegExp('^ACK');
             self.socket.ondata=function(response) {
 
                 data += self.utf8_decode(response.data);
@@ -3071,7 +3070,7 @@ define("backbone", ["jquery","underscore"], (function (global) {
                 if(data.match(error_regexp)) {
 
                     dfd.fail(data);
-                    console.error(data);
+                    console.error("error mpd",data);
                     self.eventManager.trigger("mpd_error",data);
                     self.stacked_mpd_commands=_.rest(self.stacked_mpd_commands);
                     self.resetRunningStatus();
@@ -3488,6 +3487,14 @@ define("backbone", ["jquery","underscore"], (function (global) {
 
         searchAlbum:function(value) {
             this.send('search album "'+value.toLowerCase()+'"\n',false);
+        },
+
+        searchArtist:function(value) {
+            this.send('search artist"'+value.toLowerCase()+'"\n',false);
+        },
+
+        searchTitle:function(value) {
+            this.send('search title"'+value.toLowerCase()+'"\n',false);
         },
 
         listArtists:function() {
@@ -4519,7 +4526,6 @@ define('app',[
                             });
 
         registry.mpd.on('open',function() {
-                            console.log('CONNECT!!!');
                             registry.mpd.run();
                             registry.app_ticker = setInterval(function() {
                                 registry.event_manager.trigger('tick');
@@ -5418,11 +5424,12 @@ define('routers/mpdconnections',[
     'underscore',
     'backbone',
 
-    //plugins
-    'backbone.subroute',
 
     'views/mpdconnections/edit',
-    'views/mpdconnections/list'
+    'views/mpdconnections/list',
+
+    //plugins
+    'backbone.subroute'
 
 
 ], function($,_,Backbone,editView,listView) {
@@ -5632,6 +5639,33 @@ define('collections/artists',[
                 data=this.parse_mpd_response(data);
                 return data;
             },
+            search:function(val,options) {
+                var self=this;
+
+                var success = (options.success) ? options.success : function() {};
+
+                var re = new RegExp(val.toLowerCase());
+
+
+                var prom = self.mpdconnection.listArtists();
+                
+                var filter = function(item) {
+                    return (item.toLowerCase().match(re))?false:true;
+                };
+
+
+                prom.done(function(result) {
+
+                    var data = self.parse_mpd_response(result.data,filter);
+
+                    self.reset(data);
+                    success(self);
+
+                });
+
+
+
+            },
             comparator: function(mdl1,mdl2) {
                 
                     var first = mdl1.get('Artist');
@@ -5639,7 +5673,9 @@ define('collections/artists',[
 
                     return ( (first > second && first) || !second)?1:-1;
             },
-            parse_mpd_response:function(data) {
+            parse_mpd_response:function(data,filter) {
+
+            filter = filter || function(){};
 
             var self=this;
 
@@ -5657,9 +5693,13 @@ define('collections/artists',[
 
             var done;
             _.each(data,function(item) {
+
                 done = item.match(re);
+
+
+               if(filter(done[2])) return; //we do not want rejected artists
                 
-                    var model;
+                var model;
                 if(done) {
                     model=new self.model;
                     model.set(done[1],done[2]);
@@ -5685,7 +5725,7 @@ var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments
 with(obj||{}){
 __p+='<p class="info" role="info">'+
 ((__t=( size ))==null?'':__t)+
-' items collected</p>\n\n<div role="data">\n\n<p>\nUse the search form in order to fetch some data.\n</p>\n\n</div>\n\n';
+' items collected<br/>300 items max displayed</p>\n\n<div role="infos" ></div>\n<div role="data">\n\n<p>\nUse the search form in order to fetch some data.\n</p>\n\n</div>\n\n';
 }
 return __p;
 }; });
@@ -5697,7 +5737,7 @@ __p+='<a name="goto-'+
 ((__t=( last ))==null?'':__t)+
 '"></a><h1 class="last">'+
 ((__t=(last))==null?'':__t)+
-'</h1><hr/>\n';
+'</h1>\n';
 }
 return __p;
 }; });
@@ -5746,7 +5786,7 @@ define('views/playlists/artists_detail',[
 
         initialize:function() {
            this.el = $('<li role="artist" class="list" >');
-           this.$el = $(this.el);
+           this.$el = this.el;
            this.$el.attr('data-id',this.model.cid);
         },
 
@@ -5804,7 +5844,7 @@ define('views/playlists/artists',[
 
     'views/playlists/artists_detail'
 
-],function($,_,Backbone,app,ArtistCollection,tplArtist,detailedArtistView) {
+],function($,_,Backbone,app,ArtistCollection,tplArtist,tplRoledata,detailedArtistView) {
 
 
     var view = Backbone.View.extend({
@@ -5818,34 +5858,47 @@ define('views/playlists/artists',[
         },
         collection:null,
 
-        renderdata:function(artists) {
+        renderdata:function(items) {
 
-            var last=null,first,init,keys=[],view,percent=0,i=0,size=_.size(artists),inter;
+
+
+            var last=null,first,init,keys=[],view,percent=0,i=0,size=_.size(items),inter;
             var el = $('<ul/>');
 
             var roledata=this.$el.children('[role=data]');
             roledata.empty();
 
 
-            _.each(artists,function(item) {
-                i++;
 
-                view = new detailedArtistView({model:item}); 
+            try{
+                _.each(items,function(item) {
+                    i++;
 
-                first = item.get('Artist')[0];
+                    if(i>300) {
+                        throw 'too much'; 
+                    }
 
-                if( first != last) {
+                    view = new detailedArtistView({model:item}); 
 
-                    roledata.append(el);
-                    el=$('<ul/>');
-                    keys[keys.length]=first;
-                    last = first;
-                    roledata.append(tplRoledata({last:last}));
-                }
+                    first = item.get('Artist')[0];
 
-                el.append(view.render());
+                    if( first != last) {
 
-             }); 
+                        roledata.append(el);
+                        el=$('<ul/>');
+                        keys[keys.length]=first;
+                        last = first;
+                        roledata.append(tplRoledata({last:last}));
+                    }
+
+                    el.append(view.render());
+
+                 }); 
+
+                 } catch (e) {
+
+
+                 }
 
             roledata.append(el);
         },
@@ -5854,7 +5907,7 @@ define('views/playlists/artists',[
             var self=this;
             var data={};
 
-
+            self.$el.html(tplArtist({size:'~'}));
             var coll = this.collection;
 
             app.registry.mpd.stats().then(function(result) {
@@ -5878,22 +5931,11 @@ define('views/playlists/artists',[
              var self=this;
 
             var c=this.collection;
-            var filterer;
-
-            var re;
-            if(val.length < 3) {
-                re="^"+val;
-            } else {
-                re=val;
-            }
-
-            re  = new RegExp(re);
-
-            filterer=function(itou) {
-                return itou.get('Artist').toUpperCase().match(re);    
-            };
-
-            self.renderdata(c.filter(filterer));
+            c.search(val,{
+                success:function(data) {
+                    self.renderdata(data.models);
+                }
+            });
         },
         'done':function(e) {
 
@@ -6009,8 +6051,6 @@ define('views/playlists/build',[
 
         filtering:function(e) {
 
-            console.log("filterings");
-
             var val=$(e.currentTarget).children('input[name=value]').val().toUpperCase();
             this.current_view.filtering(val,e);
 
@@ -6118,16 +6158,16 @@ define('routers/playlists',[
     'underscore',
     'backbone',
 
-    //plugins
-    'backbone.subroute',
 
     'views/playlists/build',
     'views/playlists/save',
-    'views/mpdconnections/list'
+    'views/mpdconnections/list',
+
+    //plugins
+    'backbone.subroute'
 
 ], function($,_,Backbone,buildView,saveView,listView) {
 
-    var view;
 
     var router = Backbone.SubRoute.extend({
 
@@ -6142,19 +6182,19 @@ define('routers/playlists',[
 
         build : function() {
             var self=this;
-            view = new buildView();
+            var view = new buildView();
             self.appManager.showView(view);
         },
 
         save : function() {
             var self=this;
-            view = new saveView();
+            var view = new saveView();
             self.appManager.showView(view);
         },
 
         list : function() {
             var self=this;
-            view = new listView();
+            var view = new listView();
             self.appManager.showView(view);
         }
 

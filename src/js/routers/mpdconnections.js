@@ -21,11 +21,12 @@ define([
     'underscore',
     'backbone',
 
-    //plugins
-    'backbone.subroute',
 
     'views/mpdconnections/edit',
-    'views/mpdconnections/list'
+    'views/mpdconnections/list',
+
+    //plugins
+    'backbone.subroute'
 
 
 ], function($,_,Backbone,editView,listView) {
