@@ -224,7 +224,7 @@
 
 
 
-            var error_regexp = new RegExp('ACK');
+            var error_regexp = new RegExp('^ACK');
             self.socket.ondata=function(response) {
 
                 data += self.utf8_decode(response.data);
@@ -232,7 +232,7 @@
                 if(data.match(error_regexp)) {
 
                     dfd.fail(data);
-                    console.error(data);
+                    console.error("error mpd",data);
                     self.eventManager.trigger("mpd_error",data);
                     self.stacked_mpd_commands=_.rest(self.stacked_mpd_commands);
                     self.resetRunningStatus();
@@ -651,6 +651,9 @@
             this.send('search album "'+value.toLowerCase()+'"\n',false);
         },
 
+        searchArtist:function(value) {
+            this.send('search artist"'+value.toLowerCase()+'"\n',false);
+        },
 
         searchTitle:function(value) {
             this.send('search title"'+value.toLowerCase()+'"\n',false);

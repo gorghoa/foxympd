@@ -32,7 +32,7 @@ define([
 
         initialize:function() {
            this.el = $('<li role="artist" class="list" >');
-           this.$el = $(this.el);
+           this.$el = this.el;
            this.$el.attr('data-id',this.model.cid);
         },
 

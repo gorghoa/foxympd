@@ -81,8 +81,6 @@ define([
 
         filtering:function(e) {
 
-            console.log("filterings");
-
             var val=$(e.currentTarget).children('input[name=value]').val().toUpperCase();
             this.current_view.filtering(val,e);
 

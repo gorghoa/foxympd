@@ -30,7 +30,7 @@ define([
 
     'views/playlists/artists_detail'
 
-],function($,_,Backbone,app,ArtistCollection,tplArtist,detailedArtistView) {
+],function($,_,Backbone,app,ArtistCollection,tplArtist,tplRoledata,detailedArtistView) {
 
 
     var view = Backbone.View.extend({
@@ -44,34 +44,47 @@ define([
         },
         collection:null,
 
-        renderdata:function(artists) {
+        renderdata:function(items) {
 
-            var last=null,first,init,keys=[],view,percent=0,i=0,size=_.size(artists),inter;
+
+
+            var last=null,first,init,keys=[],view,percent=0,i=0,size=_.size(items),inter;
             var el = $('<ul/>');
 
             var roledata=this.$el.children('[role=data]');
             roledata.empty();
 
 
-            _.each(artists,function(item) {
-                i++;
 
-                view = new detailedArtistView({model:item}); 
+            try{
+                _.each(items,function(item) {
+                    i++;
 
-                first = item.get('Artist')[0];
+                    if(i>300) {
+                        throw 'too much'; 
+                    }
 
-                if( first != last) {
+                    view = new detailedArtistView({model:item}); 
 
-                    roledata.append(el);
-                    el=$('<ul/>');
-                    keys[keys.length]=first;
-                    last = first;
-                    roledata.append(tplRoledata({last:last}));
-                }
+                    first = item.get('Artist')[0];
 
-                el.append(view.render());
+                    if( first != last) {
 
-             }); 
+                        roledata.append(el);
+                        el=$('<ul/>');
+                        keys[keys.length]=first;
+                        last = first;
+                        roledata.append(tplRoledata({last:last}));
+                    }
+
+                    el.append(view.render());
+
+                 }); 
+
+                 } catch (e) {
+
+
+                 }
 
             roledata.append(el);
         },
@@ -81,8 +94,8 @@ define([
             var data={};
 
             self.$el.html(tplArtist({size:'~'}));
-            /*
             var coll = this.collection;
+
             app.registry.mpd.stats().then(function(result) {
 
                 self.$el.html(tplArtist({size:result.data.artists}));
@@ -94,7 +107,6 @@ define([
                     }
                 });
             });
-            */
 
             return self.$el;
 

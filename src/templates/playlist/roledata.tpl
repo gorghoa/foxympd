@@ -1,1 +1,1 @@
-<a name="goto-<%= last %>"></a><h1 class="last"><%=last%></h1><hr/>
+<a name="goto-<%= last %>"></a><h1 class="last"><%=last%></h1>

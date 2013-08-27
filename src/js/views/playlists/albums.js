@@ -44,17 +44,22 @@ define([
         },
         collection:null,
 
-        renderdata:function(albums) {
+        renderdata:function(items) {
 
-            var last=null,first,init,keys=[],view,percent=0,i=0,size=_.size(albums),inter;
+            var last=null,first,init,keys=[],view,percent=0,i=0,size=_.size(items),inter;
             var el = $('<ul/>');
 
             var roledata=this.$el.children('[role=data]');
             roledata.empty();
 
 
-            _.each(albums,function(item) {
+            try{
+            _.each(items,function(item) {
                 i++;
+
+                    if(i>300) {
+                        throw 'too much'; 
+                    }
 
                 view = new detailedAlbumView({model:item}); 
 
@@ -73,6 +78,11 @@ define([
 
              }); 
 
+                 } catch (e) {
+
+
+                 }
+
             roledata.append(el);
         },
         render: function() {
@@ -80,8 +90,8 @@ define([
             var self=this;
             var data={};
 
-            self.$el.html(tpl({size:'~'}));
-            /*
+            self.$el.html(tplAlbum({size:'~'}));
+
             var coll = this.collection;
 
             app.registry.mpd.stats().then(function(result) {
@@ -95,7 +105,6 @@ define([
                     }
                 });
             });
-            */
 
             return self.$el;
 

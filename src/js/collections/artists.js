@@ -45,9 +45,21 @@ define([
 
                 var success = (options.success) ? options.success : function() {};
 
-                this.mpdconnection.search(val).done(function(result) {
-                    self.reset(self.parse_mpd_response(result.data));
+                var re = new RegExp(val.toLowerCase());
+
+
+                var prom = self.mpdconnection.listArtists();
                 
+                var filter = function(item) {
+                    return (item.toLowerCase().match(re))?false:true;
+                };
+
+
+                prom.done(function(result) {
+
+                    var data = self.parse_mpd_response(result.data,filter);
+
+                    self.reset(data);
                     success(self);
 
                 });
@@ -62,7 +74,9 @@ define([
 
                     return ( (first > second && first) || !second)?1:-1;
             },
-            parse_mpd_response:function(data) {
+            parse_mpd_response:function(data,filter) {
+
+            filter = filter || function(){};
 
             var self=this;
 
@@ -80,9 +94,13 @@ define([
 
             var done;
             _.each(data,function(item) {
+
                 done = item.match(re);
+
+
+               if(filter(done[2])) return; //we do not want rejected artists
                 
-                    var model;
+                var model;
                 if(done) {
                     model=new self.model;
                     model.set(done[1],done[2]);
