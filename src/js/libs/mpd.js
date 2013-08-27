@@ -173,7 +173,6 @@
 
 
                 if(result.data.match(/OK\n$/)) {
-
                     console.log("idledata",self.idledata);
                     self.manageIdleData(self.idledata);
                     self.status();
@@ -650,6 +649,11 @@
 
         searchAlbum:function(value) {
             this.send('search album "'+value.toLowerCase()+'"\n',false);
+        },
+
+
+        searchTitle:function(value) {
+            this.send('search title"'+value.toLowerCase()+'"\n',false);
         },
 
         listArtists:function() {

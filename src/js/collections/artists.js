@@ -40,6 +40,21 @@ define([
                 data=this.parse_mpd_response(data);
                 return data;
             },
+            search:function(val,options) {
+                var self=this;
+
+                var success = (options.success) ? options.success : function() {};
+
+                this.mpdconnection.search(val).done(function(result) {
+                    self.reset(self.parse_mpd_response(result.data));
+                
+                    success(self);
+
+                });
+
+
+
+            },
             comparator: function(mdl1,mdl2) {
                 
                     var first = mdl1.get('Artist');

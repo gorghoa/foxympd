@@ -5,17 +5,6 @@ module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
 
-    uglify: {
-      options: {
-        banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
-      },
-      build: {
-        src: 'src/js/main.js',
-        dest: 'build/<%= pkg.name %>.min.js'
-      }
-    },
-
-
     requirejs: {
         compile: {
             options:{
@@ -27,17 +16,8 @@ module.exports = function(grunt) {
             }
         }
     
-    },
-
-    jst: {
-      compile: {
-        options: {
-        },
-        files: {
-          "build/templates.js": ["src/templates/**/*.tpl"]
-        }
-      }
     }
+
   });
 
   // Load the plugin that provides the "uglify" task.
@@ -48,5 +28,6 @@ module.exports = function(grunt) {
 
   // Default task(s).
   grunt.registerTask('default', ['requirejs']);
+  grunt.registerTask('travis', ['requirejs']);
 
 };

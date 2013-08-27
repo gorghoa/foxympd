@@ -80,7 +80,8 @@ define([
             var self=this;
             var data={};
 
-
+            self.$el.html(tpl({size:'~'}));
+            /*
             var coll = this.collection;
 
             app.registry.mpd.stats().then(function(result) {
@@ -94,6 +95,7 @@ define([
                     }
                 });
             });
+            */
 
             return self.$el;
 
@@ -119,22 +121,11 @@ define([
              var self=this;
 
             var c=this.collection;
-            var filterer;
-
-            var re;
-            if(val.length < 3) {
-                re="^"+val;
-            } else {
-                re=val;
-            }
-
-            re  = new RegExp(re);
-
-            filterer=function(itou) {
-                return itou.get('Album').toUpperCase().match(re);    
-            };
-
-            self.renderdata(c.filter(filterer));
+            c.search(val,{
+                success:function(data) {
+                    self.renderdata(data.models);
+                }
+            });
         },
         'done':function(e) {
 

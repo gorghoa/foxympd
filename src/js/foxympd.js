@@ -5993,6 +5993,8 @@ define('views/playlists/build',[
             app.headerView.setActionButtons([done]);
 
             app.headerView.setTitle('Build a playlist');
+
+
             this.$el.html(tplMain({current_view:this.current_view}));
              
             this.changeView('artists',function(view) {

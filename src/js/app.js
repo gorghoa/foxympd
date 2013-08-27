@@ -95,7 +95,6 @@ define([
                             });
 
         registry.mpd.on('open',function() {
-                            console.log('CONNECT!!!');
                             registry.mpd.run();
                             registry.app_ticker = setInterval(function() {
                                 registry.event_manager.trigger('tick');

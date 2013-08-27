@@ -83,13 +83,16 @@ define([
             var self=this;
             var data={};
 
-            var coll = this.collection;
 
+            self.$el.html(tpl({size:'~'}));
+            /*
+            var coll = this.collection;
             app.registry.mpd.stats().then(function(result) {
 
                 self.$el.html(tpl({size:'~'}));
                 
             });
+            */
 
             return self.$el;
 
