@@ -5028,7 +5028,7 @@ define('timetools',[],function() {
 define('tpl!templates/header', [],function () { return function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='<menu type="toolbar"  id="menu_buttons">\n</menu>\n<nav>\n<a href="#"  class="lsf home">circle</a>\n</nav>\n\n<div class="titles">\n<h1>\n    FoxyMPD\n</h1>\n<h2 role="tick">\n   ~~~ \n</h2>\n</div>\n';
+__p+='<menu type="toolbar"  id="menu_buttons">\n</menu>\n<nav>\n    <a href="#"  class="lsf home">circle</a>\n</nav>\n\n<div class="titles">\n<h1>\n    FoxyMPD\n</h1>\n<h2 role="tick">\n   ~~~ \n</h2>\n</div>\n';
 }
 return __p;
 }; });
