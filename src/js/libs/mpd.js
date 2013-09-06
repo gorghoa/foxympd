@@ -88,6 +88,7 @@
 
         setConnectInfos:function(connect_infos) {
             this.connect_infos=connect_infos;
+            console.log('set');
         },
 
         resetRunningStatus:function() {
@@ -137,8 +138,11 @@
 
             this.close();
 
-            this.socket = TCPSocket.open(this.connect_infos.host,this.connect_infos.port); 
-            this.idlesocket = TCPSocket.open(host,port); 
+
+
+            self.socket = TCPSocket.open(self.connect_infos.host,self.connect_infos.port); 
+            self.idlesocket = TCPSocket.open(host,port); 
+
 
             this.idlesocket.onopen = function() {
                 if(password) {
@@ -234,23 +238,24 @@
                     dfd.fail(data);
                     console.error("error mpd",data);
                     self.eventManager.trigger("mpd_error",data);
-                    self.stacked_mpd_commands=_.rest(self.stacked_mpd_commands);
-                    self.resetRunningStatus();
-                    self.run();
-                    return;
 
                 } else if (data.match(endstring)) {
 
                     data = (parse) ? self.parse_mpd_response(data): data;
                     dfd.resolve({data:data});
-                    self.stacked_mpd_commands=_.rest(self.stacked_mpd_commands);
-                    self.resetRunningStatus();
-                    self.run();
-                    return;
                 }
+
+                self.stacked_mpd_commands=_.rest(self.stacked_mpd_commands);
+                  
+                if(_.size(self.stacked_mpd_commands)) self.eventManager.trigger('stopsendingdata');
+                
+                self.resetRunningStatus();
+                self.run();
+                return;
             };
 
             self.socket.send(actionString);
+            self.eventManager.trigger('sendingdata');
         },
 
 
@@ -258,9 +263,11 @@
 
             var dfd = $.Deferred();
 
-            this.stacked_mpd_commands.push({command:this.utf8_encode(actionString),parse:parse,dfd:dfd});
+            var self=this;
 
-            this.run();
+            self.stacked_mpd_commands.push({command:self.utf8_encode(actionString),parse:parse,dfd:dfd});
+
+            self.run();
 
             return dfd.promise();
 
@@ -360,6 +367,8 @@
             
             var isp = stat.then(function() {
                 var result = self.solvePlaying(self.statusdata.state);
+
+                //console.log(result);
 
                 if(result===true) {
                     return self.pause(result);

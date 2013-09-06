@@ -21,31 +21,19 @@ define([
     'underscore',
     'backbone',
 
-    'app',
-
-    'tpl!templates/playlist/saveplaylist'
-
-
-],function($,_,Backbone,app,tpl) {
+    'app'
+],function($,_,Backbone,app) {
 
 
     var view = Backbone.View.extend({
 
-        initialize: function() {
-        },
         render: function() {
-            var self=this;
-            self.$el.html(tpl({}));
-        },
-        events: {
-            "submit form":'savePlaylist'
-        }, 
-        savePlaylist:function(e) {
-            
-            var form = $(e.currentTarget);
-            var name = form.children('input[name=name]').val();
-
-            app.registry.mpd.savePlaylist(name);
+            var name = prompt('Playlist name');
+            var prom = app.registry.mpd.savePlaylist(name);
+            prom.done(function() {
+                alert('Your playlist has been saved');
+                app.registry.app_router.navigate('',{trigger:true});
+            });
 
             return false;
         }

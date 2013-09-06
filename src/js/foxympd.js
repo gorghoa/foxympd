@@ -2926,6 +2926,7 @@ define("backbone", ["jquery","underscore"], (function (global) {
 
         setConnectInfos:function(connect_infos) {
             this.connect_infos=connect_infos;
+            console.log('set');
         },
 
         resetRunningStatus:function() {
@@ -2975,8 +2976,11 @@ define("backbone", ["jquery","underscore"], (function (global) {
 
             this.close();
 
-            this.socket = TCPSocket.open(this.connect_infos.host,this.connect_infos.port); 
-            this.idlesocket = TCPSocket.open(host,port); 
+
+
+            self.socket = TCPSocket.open(self.connect_infos.host,self.connect_infos.port); 
+            self.idlesocket = TCPSocket.open(host,port); 
+
 
             this.idlesocket.onopen = function() {
                 if(password) {
@@ -3072,23 +3076,24 @@ define("backbone", ["jquery","underscore"], (function (global) {
                     dfd.fail(data);
                     console.error("error mpd",data);
                     self.eventManager.trigger("mpd_error",data);
-                    self.stacked_mpd_commands=_.rest(self.stacked_mpd_commands);
-                    self.resetRunningStatus();
-                    self.run();
-                    return;
 
                 } else if (data.match(endstring)) {
 
                     data = (parse) ? self.parse_mpd_response(data): data;
                     dfd.resolve({data:data});
-                    self.stacked_mpd_commands=_.rest(self.stacked_mpd_commands);
-                    self.resetRunningStatus();
-                    self.run();
-                    return;
                 }
+
+                self.stacked_mpd_commands=_.rest(self.stacked_mpd_commands);
+                  
+                if(_.size(self.stacked_mpd_commands)) self.eventManager.trigger('stopsendingdata');
+                
+                self.resetRunningStatus();
+                self.run();
+                return;
             };
 
             self.socket.send(actionString);
+            self.eventManager.trigger('sendingdata');
         },
 
 
@@ -3096,9 +3101,11 @@ define("backbone", ["jquery","underscore"], (function (global) {
 
             var dfd = $.Deferred();
 
-            this.stacked_mpd_commands.push({command:this.utf8_encode(actionString),parse:parse,dfd:dfd});
+            var self=this;
 
-            this.run();
+            self.stacked_mpd_commands.push({command:self.utf8_encode(actionString),parse:parse,dfd:dfd});
+
+            self.run();
 
             return dfd.promise();
 
@@ -3198,6 +3205,8 @@ define("backbone", ["jquery","underscore"], (function (global) {
             
             var isp = stat.then(function() {
                 var result = self.solvePlaying(self.statusdata.state);
+
+                //console.log(result);
 
                 if(result===true) {
                     return self.pause(result);
@@ -4464,6 +4473,7 @@ define('app',[
 ], function($,_,Backbone,MPD,AppManager,MPDConnectionCollection) {
 
 
+    var noMPDCONNECTION=false;
     var registry={
             collections:{},
             user:null,
@@ -4475,19 +4485,43 @@ define('app',[
     var headerView={};
 
 
+
+
+    var onLineEL = $('section[role=network-status]');
+    var networkStatusEl = $('section[role=network-status]').children('.network');
+    var mpdStatusEl = onLineEL.children('.mpd'); 
+
+    networkStatusEl.text('no network connection');
+    var updateOnlineStatus = function (event) {
+        var condition = navigator.onLine ? "online" : "offline";
+
+        if(condition==='offline') {
+            networkStatusEl.show();
+        } else {
+            networkStatusEl.hide();
+        }
+    };
+
+
+
+    /**
+     * turn off locking screen and mpd connection when the app is not visible 
+     */
     var visibilityAction=function() {
-        var prom;
+        var prom,lock=null;
 
         switch(document.visibilityState) {
 
             case "hidden":
+
+                if(lock) lock.unlock();
+
                 prom = registry.mpd.close();
-                prom.done(function() {
-                });
                 break;
 
             case "visible":
             default:
+                lock = window.navigator.requestWakeLock('screen');
 
                 if(!registry.mpd.connect_infos.length) break;
 
@@ -4497,13 +4531,27 @@ define('app',[
                     console.warn("visible error: ",e);
                 });
 
-                prom.done(function() {
-                });
-                
                 break;
 
 
         }
+
+
+    };
+
+    var updateMPDStatusButton=function() {
+        var errtext = (!noMPDCONNECTION) ?'mpd connection error, press to retry':'no mpd connection, press to add one' ;
+
+
+        mpdStatusEl.text(errtext);
+        mpdStatusEl.unbind('click');
+
+        mpdStatusEl.click(function() {
+
+            if(noMPDCONNECTION===true) registry.app_router.navigate('connections/add',{trigger:true});
+            else registry.mpd.connect(); 
+
+        });
 
 
     };
@@ -4521,12 +4569,23 @@ define('app',[
         _.extend(registry.event_manager,Backbone.Events);
 
 
+
+        updateMPDStatusButton();
+
+
+        registry.mpd.on('mpd_error',function(data) {
+            alert("mpd error:\n"+data+i);
+        });
+
         registry.mpd.on('close',function() {
                                         clearInterval(registry.app_ticker);
+                                        updateMPDStatusButton();
+                                        mpdStatusEl.show();
                             });
 
         registry.mpd.on('open',function() {
                             registry.mpd.run();
+                            mpdStatusEl.text('connected').fadeOut(800);
                             registry.app_ticker = setInterval(function() {
                                 registry.event_manager.trigger('tick');
                             },1000);
@@ -4537,6 +4596,11 @@ define('app',[
         document.addEventListener("visibilitychange",function() {
             visibilityAction();
         });
+  
+
+        updateOnlineStatus();
+        document.addEventListener('online',  updateOnlineStatus);
+        document.addEventListener('offline', updateOnlineStatus);
 
 
         var conn = mpdconnect();
@@ -4544,27 +4608,59 @@ define('app',[
         conn.done(function() {
             dfd.resolve();
         });
-        
+
         conn.fail(function() {
-            dfd.reject(); 
+            dfd.reject();
         });
+
 
         return dfd.promise();
         
 
     };
 
-    var mpdconnect=function() {
+    var mpdconnect=function(model) {
 
-        
         var dfd = $.Deferred();
+        var promise = dfd.promise();
+        var mpd=registry.mpd;
+
+
+        var doConnect = function (model,promise) {
+
+                if(!model) {
+                    dfd.reject();
+                    return promise;
+                }
+
+
+                console.log('nyang cat');
+                mpd.once('open',function() {
+                    mpd.stats().done(function(result) {
+                        var stats=result.data;
+                        model.set('stats',stats);
+                        model.set('last_connection',new Date().getTime());
+                        model.save();
+                    });
+                });
+                console.log('setting connctinso');
+                mpd.setConnectInfos(model.attributes);
+                mpd.connect();
+                dfd.resolve();
+
+                return promise;
+
+        };
+
+
+        if(typeof(model) === "object" ) return doConnect(model,promise);
+        
 
         if(typeof TCPSocket === 'undefined' && typeof mozTCPSocket === 'undefined') {
             dfd.reject();
-            return dfd.promise();
+            return promise;
         }
 
-        var mpd=registry.mpd;
         try{
             coll = new MPDConnectionCollection;
             coll.comparator = function(model,model2) {
@@ -4574,24 +4670,14 @@ define('app',[
                success:function(data)  {
 
                 model=data.last();
+                if(data.size()===0) noMPDCONNECTION = true;
+                else noMPDCONNECTION = false;
 
-                if(!model) {
-                    dfd.reject();
-                    return;
-                }
+                updateMPDStatusButton();
+
+                return doConnect(model,promise);
 
 
-                mpd.once('open',function() {
-                    mpd.stats().done(function(result) {
-                        var stats=result.data;
-                        model.set('stats',stats);
-                        model.set('last_connection',new Date().getTime());
-                        model.save();
-                    });
-                });
-                mpd.setConnectInfos(model.attributes);
-                mpd.connect();
-                dfd.resolve();
                }
             });
         } catch (e) {
@@ -4600,7 +4686,7 @@ define('app',[
             }
 
 
-            return dfd.promise();
+            return promise;
 
     };
 
@@ -4993,6 +5079,13 @@ define('views/header',[
                     self.updateTitles();
             });
 
+            app.registry.mpd.on('sendingdata',function(){
+                    self.updateStatus(true);
+            });
+            app.registry.mpd.on('stopsendingdata',function(){
+                    self.updateStatus(false);
+            });
+
 
             app.registry.event_manager.on('tick',function(){
                 self.updateElapsedTime();
@@ -5006,6 +5099,9 @@ define('views/header',[
             this.$el.html(re);
             this.updateTitles();
 
+        },
+        updateStatus:function(force) {
+            $('nav.home').toggleClass('ondata',force);
         },
         updateTitles:function() {
             var self=this;
@@ -5112,7 +5208,7 @@ __p+='\n        <tr>\n            <th>'+
 ((__t=( value ))==null?'':__t)+
 '</td>\n        </tr>\n    ';
  });  
-__p+='\n    </tbody>\n    </table>\n';
+__p+='\n    </tbody>\n    </table>\n\n<ul>\n    <li>\n        <a role="button" class="danger delete"  ><span class="lsf">eraser</span>&nbsp;delete</a>\n    </li>\n</ul>\n';
 }
 return __p;
 }; });
@@ -5120,11 +5216,13 @@ return __p;
 define('tpl!templates/mpdconnections/edit', [],function () { return function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='';
+__p+='<p class="info">\n';
  if (model) { 
-__p+='\n\n<p class="info">\n    Add a new mpd connection.\n</p>\n';
+__p+='\n    Edit mpd connection.\n';
+ } else {
+__p+='\n    Add a new mpd connection.\n';
  } 
-__p+='\n<form >\n    <div>\n        <label for="host">host</label>\n        <input type="text"  name="host" id="host" value="'+
+__p+='\n</p>\n<form >\n    <div>\n        <label for="host">host</label>\n        <input type="text"  name="host" id="host" value="'+
 ((__t=( model.get('host') || '192.168.' ))==null?'':__t)+
 '" />\n    </div>\n    <div>\n        <label for="port">port </label>\n        <input type="port"  name="port" id="port" value="'+
 ((__t=( model.get('port') || 6600 ))==null?'':__t)+
@@ -5133,10 +5231,6 @@ __p+='\n<form >\n    <div>\n        <label for="host">host</label>\n        <inp
 '"  />\n    </div>\n    <div>\n        <label for="name">name</label>\n        <input type="text"  name="name" id="name" value="'+
 ((__t=( model.get('name') || 'coin' ))==null?'':__t)+
 '" />\n    </div>\n</form>\n\n\n\n';
- if (model.id) { 
-__p+='\n<ul>\n    <li>\n        <a role="delete" class="danger"><span class="lsf">eraser</span>&nbsp;delete</>\n    </li>\n</ul>\n';
- } 
-__p+='\n';
 }
 return __p;
 }; });
@@ -5189,6 +5283,8 @@ define('views/mpdconnections/edit',[
 
         render: function() {
 
+            $('div[role=toolbar]').hide();
+            $('section[role=network-status]').hide();
             var self=this;
 
             var data={model:this.model,update:this.update};
@@ -5201,6 +5297,7 @@ define('views/mpdconnections/edit',[
                 this.$el.html(tplEdit(data));
                 return;
             } 
+
 
             done = $('<a id="done" class="lsf" >edit</a>');
             done.click(function() {
@@ -5219,7 +5316,7 @@ define('views/mpdconnections/edit',[
 
         },
         events:{
-            "click a[role=delete]":'destroy_connection',
+            "click a[role=button].delete":'destroy_connection',
             "click button[role=connect]":'connect'
         },
         'destroy_connection':function() {
@@ -5229,6 +5326,12 @@ define('views/mpdconnections/edit',[
                 app.registry.app_router.navigate('connections',{trigger:true});
             }
         },
+        'connect':function() {
+            console.log('connecting with',this.model.get('host'));
+            app.mpdconnect(this.model);
+            $('[role=toolbar]').show();
+            app.registry.app_router.navigate('/',{trigger:true});
+        },
         'save':function() {
             console.log('saving');
             this.model.set('name',$('input[name=name]').val());
@@ -5236,7 +5339,8 @@ define('views/mpdconnections/edit',[
             this.model.set('port',$('input[name=port]').val());
             this.model.set('password',$('input[name=password]').val());
             this.model.save();
-            app.mpdconnect();
+            app.mpdconnect(this.model);
+            $('[role=toolbar]').show();
             app.registry.app_router.navigate('/',{trigger:true});
         }
     });
@@ -5314,7 +5418,6 @@ define('views/mpdconnections/list_detail',[
 
     return view;
 });
-
 
 
 
@@ -6070,14 +6173,6 @@ define('views/playlists/build',[
     return view;
 });
 
-define('tpl!templates/playlist/saveplaylist', [],function () { return function(obj){
-var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
-with(obj||{}){
-__p+='<form >\n    <input type="text" name="name" />\n    <input type="submit" value="save playlist" />\n</form>\n\n';
-}
-return __p;
-}; });
-
 /*
     © barosofts, César & Rodrigue Villetard, 2013
 
@@ -6101,31 +6196,19 @@ define('views/playlists/save',[
     'underscore',
     'backbone',
 
-    'app',
-
-    'tpl!templates/playlist/saveplaylist'
-
-
-],function($,_,Backbone,app,tpl) {
+    'app'
+],function($,_,Backbone,app) {
 
 
     var view = Backbone.View.extend({
 
-        initialize: function() {
-        },
         render: function() {
-            var self=this;
-            self.$el.html(tpl({}));
-        },
-        events: {
-            "submit form":'savePlaylist'
-        }, 
-        savePlaylist:function(e) {
-            
-            var form = $(e.currentTarget);
-            var name = form.children('input[name=name]').val();
-
-            app.registry.mpd.savePlaylist(name);
+            var name = prompt('Playlist name');
+            var prom = app.registry.mpd.savePlaylist(name);
+            prom.done(function() {
+                alert('Your playlist has been saved');
+                app.registry.app_router.navigate('',{trigger:true});
+            });
 
             return false;
         }
@@ -6697,9 +6780,9 @@ return __p;
 define('tpl!templates/mpdfetching', [],function () { return function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='<h2>mpd is currently fetching some info.</h2>\n\n<p>\n'+
+__p+='<p>\n'+
 ((__t=( message ))==null?'':__t)+
-'\n</p>\n\n';
+'\n</p>\n\n<p>\n    <img src="./imgs/icon-128.png" />\n</p>\n\n';
 }
 return __p;
 }; });
@@ -6748,6 +6831,7 @@ define('views/home',[
             app.registry.mpd.on('playlist_changed',function() {self.render();});
             app.registry.mpd.on('player_changed',function() {self.updateHeader();});
 
+
         },
         close:function() {
             //@todo kill mpd listeners
@@ -6758,13 +6842,15 @@ define('views/home',[
                 mpdconnection: app.registry.mpd
             });
 
+
             var self=this;
 
             var tmpview;
             var data={};
             var rendered_connections = $('<ul/>');
 
-            self.$el.html(mpdfetchingTpl({message:'opening current playlist'}));
+            self.$el.html(mpdfetchingTpl({message:'waiting for mpd…'}));
+
 
             playlist.fetch({
                 success: function(datum) {

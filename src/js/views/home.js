@@ -42,6 +42,7 @@ define([
             app.registry.mpd.on('playlist_changed',function() {self.render();});
             app.registry.mpd.on('player_changed',function() {self.updateHeader();});
 
+
         },
         close:function() {
             //@todo kill mpd listeners
@@ -52,13 +53,15 @@ define([
                 mpdconnection: app.registry.mpd
             });
 
+
             var self=this;
 
             var tmpview;
             var data={};
             var rendered_connections = $('<ul/>');
 
-            self.$el.html(mpdfetchingTpl({message:'opening current playlist'}));
+            self.$el.html(mpdfetchingTpl({message:'waiting for mpd…'}));
+
 
             playlist.fetch({
                 success: function(datum) {

@@ -46,6 +46,8 @@ define([
 
         render: function() {
 
+            $('div[role=toolbar]').hide();
+            $('section[role=network-status]').hide();
             var self=this;
 
             var data={model:this.model,update:this.update};
@@ -58,6 +60,7 @@ define([
                 this.$el.html(tplEdit(data));
                 return;
             } 
+
 
             done = $('<a id="done" class="lsf" >edit</a>');
             done.click(function() {
@@ -76,7 +79,7 @@ define([
 
         },
         events:{
-            "click a[role=delete]":'destroy_connection',
+            "click a[role=button].delete":'destroy_connection',
             "click button[role=connect]":'connect'
         },
         'destroy_connection':function() {
@@ -86,6 +89,12 @@ define([
                 app.registry.app_router.navigate('connections',{trigger:true});
             }
         },
+        'connect':function() {
+            console.log('connecting with',this.model.get('host'));
+            app.mpdconnect(this.model);
+            $('[role=toolbar]').show();
+            app.registry.app_router.navigate('/',{trigger:true});
+        },
         'save':function() {
             console.log('saving');
             this.model.set('name',$('input[name=name]').val());
@@ -93,7 +102,8 @@ define([
             this.model.set('port',$('input[name=port]').val());
             this.model.set('password',$('input[name=password]').val());
             this.model.save();
-            app.mpdconnect();
+            app.mpdconnect(this.model);
+            $('[role=toolbar]').show();
             app.registry.app_router.navigate('/',{trigger:true});
         }
     });

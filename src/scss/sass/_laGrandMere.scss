@@ -34,11 +34,6 @@ a .lsf.icon {
     text-align: center;
 }
 
-a[role=button] {
-    display:inline-block;
-    padding:5px;
-    width:100%;
-}
 
 form {
     text-align:center;
@@ -179,4 +174,8 @@ section[role=main] h1 {
     border-bottom:1px solid orange;
     text-align:left;
     font-size:1.2rem;
+}
+
+.ondata {
+    color:red;
 }

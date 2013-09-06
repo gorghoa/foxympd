@@ -44,6 +44,13 @@ define([
                     self.updateTitles();
             });
 
+            app.registry.mpd.on('sendingdata',function(){
+                    self.updateStatus(true);
+            });
+            app.registry.mpd.on('stopsendingdata',function(){
+                    self.updateStatus(false);
+            });
+
 
             app.registry.event_manager.on('tick',function(){
                 self.updateElapsedTime();
@@ -57,6 +64,9 @@ define([
             this.$el.html(re);
             this.updateTitles();
 
+        },
+        updateStatus:function(force) {
+            $('nav.home').toggleClass('ondata',force);
         },
         updateTitles:function() {
             var self=this;

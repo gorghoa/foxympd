@@ -63,3 +63,9 @@
     <% });  %>
     </tbody>
     </table>
+
+<ul>
+    <li>
+        <a role="button" class="danger delete"  ><span class="lsf">eraser</span>&nbsp;delete</a>
+    </li>
+</ul>

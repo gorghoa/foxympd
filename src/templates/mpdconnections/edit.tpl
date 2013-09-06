@@ -1,9 +1,10 @@
-<% if (model) { %>
-
 <p class="info">
+<% if (model) { %>
+    Edit mpd connection.
+<% } else {%>
     Add a new mpd connection.
-</p>
 <% } %>
+</p>
 <form >
     <div>
         <label for="host">host</label>
@@ -25,10 +26,3 @@
 
 
 
-<% if (model.id) { %>
-<ul>
-    <li>
-        <a role="delete" class="danger"><span class="lsf">eraser</span>&nbsp;delete</>
-    </li>
-</ul>
-<% } %>

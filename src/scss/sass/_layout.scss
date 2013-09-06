@@ -1,7 +1,44 @@
 layout {
 
 }
+section[role=network-status]  {
+    bottom:1.5rem;
+    left:0;
+    margin:0;
+    position:fixed;
+    text-align:center;
+    z-index:101;
+    width:100%;
+}
 
+section[role=network-status] .network {
+    text-shadow:1px 1px 1px #FFF;
+    background:#FFF;
+    border:3px solid red;
+    border-radius:5px;
+    color:red;
+    text-align:center;
+    font-weight:bold;
+}
+
+section[role=network-status] .span {
+    display:block;
+    margin:auto;
+}
+
+section[role=network-status] .mpd{
+    background:-moz-linear-gradient(top,rgb(110,0,10) 50%,rgb(60,0,10) 50%);
+    border:3px solid #FFF;
+    border-radius:5px;
+    padding:0.5rem 1rem;
+    font-size:0.8em;
+    color:#FFF;
+    text-align:center;
+}
+
+section[role=network-status] .mpd:focus, section[role=network-status] .mpd:active{
+    background:-moz-linear-gradient(top,rgb(10,0,100) 50%,rgb(10,0,50) 50%);
+}
 
 section[role=main] {
     margin-top:2rem;
