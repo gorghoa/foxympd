@@ -7168,7 +7168,7 @@ __p+='<h1>'+
 return __p;
 }; });
 
-define('text!views/../../manifest.webapp',[],function () { return '{\n  "version": "0.0.2",\n  "name": "FoxyMPD",\n  "default_locale": "en",\n  "locales": {\n    "en": {\n      "name": "FoxyMPD",\n      "description": "mpd client for firefox os"\n    }\n  },\n  "description": "mpd client for firefox os",\n  "launch_path" : "/index.html",\n  "icons": {\n    "16": "/imgs/icon-16.png",\n    "48": "/imgs/icon-48.png",\n    "128": "/imgs/icon-128.png"\n  },\n  "permissions" : {\n        "tcp-socket": {"description":"needed for connection to mpd server"}\n  },\n  "type": "privileged",\n  "developer": {\n    "name": "barosofts",\n    "url": "https://github.com/gorghoa/foxympd"\n  }\n}\n';});
+define('text!views/../../manifest.webapp',[],function () { return '{\n  "version": "0.0.3",\n  "name": "FoxyMPD",\n  "default_locale": "en",\n  "locales": {\n    "en": {\n      "name": "FoxyMPD",\n      "description": "mpd client for firefox os"\n    }\n  },\n  "description": "mpd client for firefox os",\n  "launch_path" : "/index.html",\n  "icons": {\n    "16": "/imgs/icon-16.png",\n    "48": "/imgs/icon-48.png",\n    "60": "/imgs/icon-60.png",\n    "128": "/imgs/icon-128.png"\n  },\n  "permissions" : {\n        "tcp-socket": {"description":"needed for connection to mpd server"}\n  },\n  "type": "privileged",\n  "developer": {\n    "name": "barosofts",\n    "url": "https://github.com/gorghoa/foxympd"\n  }\n}\n';});
 
 /*
     © barosofts, César & Rodrigue Villetard, 2013
