@@ -46,7 +46,13 @@ Run r.js optimizer, concat all js and compiled templates in one file situated in
 Test the app
 ============
 
-Install ffOS simulator, download the latest archive, extract it, add the webapp.manifest to your simulator.
+Install ffOS simulator, download the latest built archive, extract it, add the webapp.manifest to your simulator.
+
+
+Build the app
+=============
+
+run grunt build, then upload the \_build dir to your FirefoxOS device.
 
 
 Install in dev
@@ -55,16 +61,16 @@ Install in dev
 Prerequisites : 
 ---------------
 
-#. FirefoxOS Simulator 
-#. nodejs, npm and grunt-cli
+#. FirefoxOS Simulator, node.js and npm must be available
+
+install grunt :
+
+    $ sudo npm install -g grunt-cli
+
 
 Install dependencies :
-----------------------
 
     npm install
-
-
-#. install FirefoxOS Simulator plugin
 
 
 
