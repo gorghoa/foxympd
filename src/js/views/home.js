@@ -67,6 +67,7 @@ define([
             self.$el.html(mpdfetchingTpl({message:'waiting for mpd…'}));
 
 
+            if( typeof mpdConnectPromise === 'undefined') return;
             mpdConnectPromise.done(function() {
                 self.renderPlaylist();
             });
