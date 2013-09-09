@@ -2926,7 +2926,6 @@ define("backbone", ["jquery","underscore"], (function (global) {
 
         setConnectInfos:function(connect_infos) {
             this.connect_infos=connect_infos;
-            console.log('set');
         },
 
         resetRunningStatus:function() {
@@ -2946,9 +2945,15 @@ define("backbone", ["jquery","underscore"], (function (global) {
             return dfd.promise();
 
         },
+
+        getConnectionPromise:function() {
+
+            return this.connectingpromise;
+        },
         connect:function(connect_infos) {
             var dfd = $.Deferred();
 
+            this.connectingpromise=dfd.promise();
 
             if(!TCPSocket) {
                 dfd.reject("TCPSocket not available with this browser."); 
@@ -3063,34 +3068,51 @@ define("backbone", ["jquery","underscore"], (function (global) {
             var stack="";
             var data="";
             var endstring=new RegExp("OK\n");
-
-
-
             var error_regexp = new RegExp('^ACK');
+
+
+
+            var onDataEnd = function() {
+            
+                self.stacked_mpd_commands=_.rest(self.stacked_mpd_commands);
+                  
+                if(_.size(self.stacked_mpd_commands)===0) self.eventManager.trigger('stopsendingdata');
+                
+                self.resetRunningStatus();
+                self.run();
+
+            };
+
             self.socket.ondata=function(response) {
 
                 data += self.utf8_decode(response.data);
 
+                /**
+                 * If an error is caught  
+                 */
                 if(data.match(error_regexp)) {
 
                     dfd.fail(data);
                     console.error("error mpd",data);
                     self.eventManager.trigger("mpd_error",data);
 
+                    onDataEnd();
+
+                /**
+                 * Or, everything wend fine and mpd.js was able to catch the OK delimiting caracter  
+                 */
                 } else if (data.match(endstring)) {
 
                     data = (parse) ? self.parse_mpd_response(data): data;
                     dfd.resolve({data:data});
+
+                    onDataEnd();
                 }
 
-                self.stacked_mpd_commands=_.rest(self.stacked_mpd_commands);
-                  
-                if(_.size(self.stacked_mpd_commands)) self.eventManager.trigger('stopsendingdata');
-                
-                self.resetRunningStatus();
-                self.run();
+
                 return;
             };
+
 
             self.socket.send(actionString);
             self.eventManager.trigger('sendingdata');
@@ -3206,7 +3228,6 @@ define("backbone", ["jquery","underscore"], (function (global) {
             var isp = stat.then(function() {
                 var result = self.solvePlaying(self.statusdata.state);
 
-                //console.log(result);
 
                 if(result===true) {
                     return self.pause(result);
@@ -3258,13 +3279,8 @@ define("backbone", ["jquery","underscore"], (function (global) {
 
 
                if(match) {
-                   console.log('auinesrt',match,typeof(match));
                     dfd.resolve(true);
-
                 }
-
-
-                   console.log('FALSE',match,typeof(match));
                 dfd.resolve(false);
 
             
@@ -4634,7 +4650,6 @@ define('app',[
                 }
 
 
-                console.log('nyang cat');
                 mpd.once('open',function() {
                     mpd.stats().done(function(result) {
                         var stats=result.data;
@@ -4643,7 +4658,6 @@ define('app',[
                         model.save();
                     });
                 });
-                console.log('setting connctinso');
                 mpd.setConnectInfos(model.attributes);
                 mpd.connect();
                 dfd.resolve();
@@ -5101,7 +5115,10 @@ define('views/header',[
 
         },
         updateStatus:function(force) {
-            $('nav.home').toggleClass('ondata',force);
+
+            if(force===false)$('section[role="region"] header a.home.ondata').removeClass('ondata');
+            else $('section[role="region"] header a.home').addClass('ondata');
+
         },
         updateTitles:function() {
             var self=this;
@@ -6826,10 +6843,16 @@ define('views/home',[
 
     var homeView = Backbone.View.extend({
 
+
+        playlist:undefined,
         initialize: function() {
             var self=this;
             app.registry.mpd.on('playlist_changed',function() {self.render();});
             app.registry.mpd.on('player_changed',function() {self.updateHeader();});
+
+            this.playlist = new PlaylistCollection({
+                mpdconnection: app.registry.mpd
+            });
 
 
         },
@@ -6838,10 +6861,8 @@ define('views/home',[
         },
         render: function() {
 
-            var playlist = new PlaylistCollection({
-                mpdconnection: app.registry.mpd
-            });
 
+            var mpdConnectPromise = app.registry.mpd.getConnectionPromise();
 
             var self=this;
 
@@ -6852,7 +6873,18 @@ define('views/home',[
             self.$el.html(mpdfetchingTpl({message:'waiting for mpd…'}));
 
 
-            playlist.fetch({
+            mpdConnectPromise.done(function() {
+                self.renderPlaylist();
+            });
+
+        },
+
+        renderPlaylist:function() {
+
+            var self=this;
+
+                        console.log('DONE!!!');
+            self.playlist.fetch({
                 success: function(datum) {
                     if(datum) {
 
@@ -6867,6 +6899,7 @@ define('views/home',[
                     }
                 }
             });
+
         },
         events: {
             "click li[role=song]":"play"
@@ -6885,8 +6918,6 @@ define('views/home',[
                     el.toggleClass('current',true);
                 }
             });
-
-
         },
         play:function(e) {
             e.preventDefault();

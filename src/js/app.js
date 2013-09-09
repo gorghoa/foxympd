@@ -194,7 +194,6 @@ define([
                 }
 
 
-                console.log('nyang cat');
                 mpd.once('open',function() {
                     mpd.stats().done(function(result) {
                         var stats=result.data;
@@ -203,7 +202,6 @@ define([
                         model.save();
                     });
                 });
-                console.log('setting connctinso');
                 mpd.setConnectInfos(model.attributes);
                 mpd.connect();
                 dfd.resolve();

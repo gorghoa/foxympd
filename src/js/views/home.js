@@ -37,10 +37,16 @@ define([
 
     var homeView = Backbone.View.extend({
 
+
+        playlist:undefined,
         initialize: function() {
             var self=this;
             app.registry.mpd.on('playlist_changed',function() {self.render();});
             app.registry.mpd.on('player_changed',function() {self.updateHeader();});
+
+            this.playlist = new PlaylistCollection({
+                mpdconnection: app.registry.mpd
+            });
 
 
         },
@@ -49,10 +55,8 @@ define([
         },
         render: function() {
 
-            var playlist = new PlaylistCollection({
-                mpdconnection: app.registry.mpd
-            });
 
+            var mpdConnectPromise = app.registry.mpd.getConnectionPromise();
 
             var self=this;
 
@@ -63,7 +67,18 @@ define([
             self.$el.html(mpdfetchingTpl({message:'waiting for mpd…'}));
 
 
-            playlist.fetch({
+            mpdConnectPromise.done(function() {
+                self.renderPlaylist();
+            });
+
+        },
+
+        renderPlaylist:function() {
+
+            var self=this;
+
+                        console.log('DONE!!!');
+            self.playlist.fetch({
                 success: function(datum) {
                     if(datum) {
 
@@ -78,6 +93,7 @@ define([
                     }
                 }
             });
+
         },
         events: {
             "click li[role=song]":"play"
@@ -96,8 +112,6 @@ define([
                     el.toggleClass('current',true);
                 }
             });
-
-
         },
         play:function(e) {
             e.preventDefault();

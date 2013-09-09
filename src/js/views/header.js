@@ -66,7 +66,10 @@ define([
 
         },
         updateStatus:function(force) {
-            $('nav.home').toggleClass('ondata',force);
+
+            if(force===false)$('section[role="region"] header a.home.ondata').removeClass('ondata');
+            else $('section[role="region"] header a.home').addClass('ondata');
+
         },
         updateTitles:function() {
             var self=this;

@@ -88,7 +88,6 @@
 
         setConnectInfos:function(connect_infos) {
             this.connect_infos=connect_infos;
-            console.log('set');
         },
 
         resetRunningStatus:function() {
@@ -108,9 +107,15 @@
             return dfd.promise();
 
         },
+
+        getConnectionPromise:function() {
+
+            return this.connectingpromise;
+        },
         connect:function(connect_infos) {
             var dfd = $.Deferred();
 
+            this.connectingpromise=dfd.promise();
 
             if(!TCPSocket) {
                 dfd.reject("TCPSocket not available with this browser."); 
@@ -225,34 +230,51 @@
             var stack="";
             var data="";
             var endstring=new RegExp("OK\n");
-
-
-
             var error_regexp = new RegExp('^ACK');
+
+
+
+            var onDataEnd = function() {
+            
+                self.stacked_mpd_commands=_.rest(self.stacked_mpd_commands);
+                  
+                if(_.size(self.stacked_mpd_commands)===0) self.eventManager.trigger('stopsendingdata');
+                
+                self.resetRunningStatus();
+                self.run();
+
+            };
+
             self.socket.ondata=function(response) {
 
                 data += self.utf8_decode(response.data);
 
+                /**
+                 * If an error is caught  
+                 */
                 if(data.match(error_regexp)) {
 
                     dfd.fail(data);
                     console.error("error mpd",data);
                     self.eventManager.trigger("mpd_error",data);
 
+                    onDataEnd();
+
+                /**
+                 * Or, everything wend fine and mpd.js was able to catch the OK delimiting caracter  
+                 */
                 } else if (data.match(endstring)) {
 
                     data = (parse) ? self.parse_mpd_response(data): data;
                     dfd.resolve({data:data});
+
+                    onDataEnd();
                 }
 
-                self.stacked_mpd_commands=_.rest(self.stacked_mpd_commands);
-                  
-                if(_.size(self.stacked_mpd_commands)) self.eventManager.trigger('stopsendingdata');
-                
-                self.resetRunningStatus();
-                self.run();
+
                 return;
             };
+
 
             self.socket.send(actionString);
             self.eventManager.trigger('sendingdata');
@@ -368,7 +390,6 @@
             var isp = stat.then(function() {
                 var result = self.solvePlaying(self.statusdata.state);
 
-                //console.log(result);
 
                 if(result===true) {
                     return self.pause(result);
@@ -420,13 +441,8 @@
 
 
                if(match) {
-                   console.log('auinesrt',match,typeof(match));
                     dfd.resolve(true);
-
                 }
-
-
-                   console.log('FALSE',match,typeof(match));
                 dfd.resolve(false);
 
             
