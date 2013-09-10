@@ -1,5 +1,7 @@
 define([
+
     'foxy/libs/mpd'
+
 ],function(MPD){
 
 
