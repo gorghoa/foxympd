@@ -6873,6 +6873,7 @@ define('views/home',[
             self.$el.html(mpdfetchingTpl({message:'waiting for mpd…'}));
 
 
+            if( typeof mpdConnectPromise === 'undefined') return;
             mpdConnectPromise.done(function() {
                 self.renderPlaylist();
             });
@@ -7332,6 +7333,7 @@ define('router',[
 });
 
 /*
+ * w
     © barosofts, César & Rodrigue Villetard, 2013
 
     This file is part of FoxyMPD.

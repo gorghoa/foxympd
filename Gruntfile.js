@@ -6,8 +6,8 @@ module.exports = function(grunt) {
 
     watch: {
      scripts: {
-        files: ['./src/js/**/*.js','!./src/js/libs/**/*.js','./src/js/libs/*.js','!./src/js/foxympd.js','./src/templates/**/*.tpl'],
-        tasks: ['requirejs']
+        files: ['./src/js/**/*.js','!./src/js/libs/**/*.js','./src/js/libs/*.js','!./src/js/foxympd.js','./src/templates/**/*.tpl','./tests/**/*.js'],
+        tasks: ['requirejs','connect','mocha_phantomjs:all']
       },
       css: {
         files: '**/*.scss',
@@ -29,6 +29,24 @@ module.exports = function(grunt) {
         }
     },
 
+    mocha: {
+     browser: ['tests/**/*.html'],
+          options: {
+            reporter: 'Nyan', // Duh!
+            run: true
+          }   
+    },
+
+
+    connect: {
+      server: {
+        options: {
+          port: 8765,
+          base: '.'
+        }
+      }
+    },
+
     copy: {
         "main":  {
             files:[
@@ -46,17 +64,42 @@ module.exports = function(grunt) {
     clean: ['build','src/js/foxympd.js','src/css/screen.css'],
 
     requirejs: {
+
+        options: {
+            name: "main",
+            baseUrl: "src/js",
+            mainConfigFile: "src/js/main.js"
+        },
+
         compile: {
             options:{
                 optimize:"none",
-                name: "main",
-                baseUrl: "src/js",
-                mainConfigFile: "src/js/main.js",
                 out: "src/js/foxympd.js"
             }
         }
     
+
     },
+
+
+  mocha_phantomjs: {
+    ci: {
+      options: {
+        reporter:'xunit',
+        'output': 'results.xml',
+        urls: [
+          'http://localhost:8765/testrunner.html'
+        ]
+      }
+    },
+    all: {
+      options: {
+        urls: [
+          'http://localhost:8765/testrunner.html'
+        ]
+      }
+    }
+  },
 
     compress: {
       main: {
@@ -82,11 +125,15 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-compress');
+  grunt.loadNpmTasks('grunt-contrib-connect');
+  grunt.loadNpmTasks('grunt-mocha');
+  grunt.loadNpmTasks('grunt-mocha-phantomjs');
 
   // Default task(s).
   grunt.registerTask('build', ['clean','requirejs','compass','copy']);
   grunt.registerTask('default', ['build']);
   grunt.registerTask('marketplace', ['build','compress']);
-  grunt.registerTask('travis', ['build','compress']);
+  grunt.registerTask('travis', ['test','build','compress']);
+  grunt.registerTask('test', ['connect','mocha_phantomjs:ci']);
 
 };
