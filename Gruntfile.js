@@ -83,6 +83,13 @@ module.exports = function(grunt) {
 
 
   mocha_phantomjs: {
+    travis: {
+      options: {
+        urls: [
+          'http://localhost:8765/testrunner.html'
+        ]
+      }
+    },
     ci: {
       options: {
         reporter:'xunit',
@@ -134,6 +141,6 @@ module.exports = function(grunt) {
   grunt.registerTask('default', ['build']);
   grunt.registerTask('marketplace', ['build','compress']);
   grunt.registerTask('travis', ['test','build','compress']);
-  grunt.registerTask('test', ['connect','mocha_phantomjs:ci']);
+  grunt.registerTask('test', ['connect','mocha_phantomjs:travis']);
 
 };
