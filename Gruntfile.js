@@ -1,4 +1,3 @@
-
 module.exports = function(grunt) {
 
   // Project configuration.
@@ -88,6 +87,6 @@ module.exports = function(grunt) {
   grunt.registerTask('build', ['clean','requirejs','compass','copy']);
   grunt.registerTask('default', ['build']);
   grunt.registerTask('marketplace', ['build','compress']);
-  grunt.registerTask('travis', ['requirejs']);
+  grunt.registerTask('travis', ['build','compress']);
 
 };
