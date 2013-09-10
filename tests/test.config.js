@@ -45,7 +45,9 @@ require.config({
 
 require([
     'mpd',
-    'mpdconnectionsUI'
+
+    //User Interface stuffs
+    'ui/mpdconnections'
 
 ], function() {
   if (window.mochaPhantomJS) { mochaPhantomJS.run(); }
