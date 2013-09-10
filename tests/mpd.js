@@ -13,35 +13,59 @@ define([
 
     describe('mpd', function() {
 
-        describe('controls',function() {
+        describe('commands', function() {
+
+            it('should be stacked');
+
+        });
+
+        describe('on data', function() {
+    
+
+            it('should wait to have receive all data before run another command');
 
 
-            describe('toggle play/pause',function() {
+        });
+
+        describe('control',function() {
+
+
+            describe('play/pause action',function() {
 
                 var mpd = new MPD(),result;
-                var currentStatus=undefined;
+                var currentStatus=undefined; //the real mocked status of mpd server
+                mpd.statusdata.state; //the cached version of mpc
 
+                /**
+                 * override mpd status 
+                 */
                 mpd.status = function() {
                     var dfd=$.Deferred();
                     mpd.statusdata.state=currentStatus;
                     return dfd.resolve({data:mpd.statusdata});
                 };
 
-                mpd.pause = function() {
-                    currentStatus = (currentStatus==='play') ? 'pause' : 'play';
+                /**
+                 * override mpd pause 
+                 */
+                mpd.pause = function(result) {
+
+                    if(result===true) {
+                        currentStatus = 'pause';
+                    }  else {
+                        currentStatus = (currentStatus==='play') ? 'pause' : 'play';
+                    }
+
+                    return $.Deferred().resolve();
+
+                };
+
+                mpd.play= function() {
+                    currentStatus = 'play';
                     return $.Deferred().resolve();
                 };
-                
-              it('when playing, play/pause button should pause',function(done) {
-                    mpd.statusdata.state='play';
-                    currentStatus='play';
-                    result = mpd.togglePlayPause().done(function() {
-                        currentStatus.should.equal('pause');
-                        done();
-                    });
-              });
 
-              it('when not playing, play/pause button should play',function(done) {
+              it('should trigger **play** when not playing',function(done) {
                     mpd.statusdata.state='pause';
                     currentStatus='pause';
                     result = mpd.togglePlayPause().done(function() {
@@ -49,12 +73,24 @@ define([
                         done();
                     });
               });
+                
+              it('should trigger **pause** when playing',function(done) {
 
-              it('when playing and cache state is out of sync, play/pause button should pause',function(done) {
-                    mpd.statusdata.state='pause';
+                    mpd.statusdata.state='play';
                     currentStatus='play';
+
                     result = mpd.togglePlayPause().done(function() {
                         currentStatus.should.equal('pause');
+                        done();
+                    });
+              });
+
+
+              it('should not be disturbed when cache state is out of sync with real mpd status',function(done) {
+                    mpd.statusdata.state='play';
+                    currentStatus='pause'; //should be the winner
+                    result = mpd.togglePlayPause().done(function() {
+                        currentStatus.should.equal('play');
                         done();
                     });
 
@@ -65,7 +101,6 @@ define([
         }); //fin describe controls
       
 
-        it('When no connection, action button should redirect to add a connection');
 
   });
 });

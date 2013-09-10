@@ -391,6 +391,7 @@
                 var result = self.solvePlaying(self.statusdata.state);
 
 
+
                 if(result===true) {
                     return self.pause(result);
                 } else {

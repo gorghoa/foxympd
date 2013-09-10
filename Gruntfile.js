@@ -7,7 +7,7 @@ module.exports = function(grunt) {
     watch: {
      scripts: {
         files: ['./src/js/**/*.js','!./src/js/libs/**/*.js','./src/js/libs/*.js','!./src/js/foxympd.js','./src/templates/**/*.tpl','./tests/**/*.js'],
-        tasks: ['requirejs','connect','mocha_phantomjs:all']
+        tasks: ['connect','mocha_phantomjs:all']
       },
       css: {
         files: '**/*.scss',
