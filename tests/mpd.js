@@ -48,16 +48,23 @@ define([
                 var part2 = 'ivers/1. PisteAudio 01.mp3\n39:file: link/Incub/- Classique -/Classique - divers/21. PisteAudio 21.mp3\nOK\n';
 
                 var i=0;
-                mpd.onDataEnd=function() {
-                    i++; 
-                    i.should.equal(1); //onDataEnd must be called only once the full response is received
-                };
 
-                r = {"data":encodeURIComponent(part1)};
-                mpd.processMPDData(r,'',$.Deferred,false); 
+                sinon.spy(mpd,'onDataEnd');
 
-                r = {"data":encodeURIComponent(part2)};
-                mpd.processMPDData(r,'',$.Deferred,false); 
+                var dfd = $.Deferred();
+
+
+                var buffer='';
+
+                r = {"data":mpd.utf8_encode(part1)};
+                buffer = mpd.processMPDData(r,buffer,dfd,false); 
+
+                r = {"data":mpd.utf8_encode(part2)};
+                mpd.processMPDData(r,buffer,dfd,false); 
+
+
+
+                    expect(mpd.onDataEnd.calledOnce).to.equal(true);
 
                 
             });
@@ -71,8 +78,8 @@ define([
             describe('play/pause action',function() {
 
                 var mpd = new MPD(),result;
-                var currentStatus=undefined; //the real mocked status of mpd server
-                mpd.statusdata.state; //the cached version of mpc
+                var currentStatus; //the real mocked status of mpd server
+                //mpd.statusdata.state is the cached version of mpc
 
                 /**
                  * override mpd status 
