@@ -48,7 +48,7 @@ require.config({
 });
 
 require([
-    'mpd',
+    'mpd/mpd',
 
     //User Interface stuffs
     'ui/mpdconnections'

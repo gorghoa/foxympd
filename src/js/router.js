@@ -27,9 +27,10 @@ define([
     'views/home',
     'views/menu',
     'views/mpddebug',
-    'views/about'
+    'views/about',
+    'views/settings'
 
-],function($,_,Backbone, mpdconnectionsRouter,playlistsRouter,homeView,menuView,mpddebugView,aboutView) {
+],function($,_,Backbone, mpdconnectionsRouter,playlistsRouter,homeView,menuView,mpddebugView,aboutView,settingsView) {
 
 
     var AppRouter = Backbone.Router.extend({
@@ -37,7 +38,8 @@ define([
             "": "home",
             "menu": "menu",
             "mpddebug": "mpddebug",
-            "about": "about"
+            "about": "about",
+            "settings":"settings"
         }
     });
 
@@ -60,6 +62,10 @@ define([
         });
         app_router.on("route:about", function (path) {
 				  var view = new aboutView();
+                  appManager.showView(view);
+        });
+        app_router.on("route:settings", function (path) {
+				  var view = new settingsView();
                   appManager.showView(view);
         });
 

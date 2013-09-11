@@ -30,15 +30,38 @@ define([
 
     var view = Backbone.View.extend({
 
+        initialize : function() {
+            this.model=app.registry.settings;
+        },
         render: function() {
 
-            this.$el.html(tpl);
+            this.$el.html(tpl({model:this.model}));
+
+            this.$el.find('#no-lock').attr('checked',(this.model.get('noLock')===true)?true:false);
 
         },
         events:{
             "submit form":'send'
         },
         'send':function(e) {
+
+            var msn=$('[role=messenger]');
+            var noLock = (this.$el.find('#no-lock').attr('checked')==='checked')?true:false;
+
+            this.model.set('noLock',noLock);
+
+
+            msn.text('saving…');
+            var res =this.model.save();
+
+            res.done(function() {
+                setTimeout(function() {
+                    msn.text('reloading…');
+                    setTimeout(function() {
+                        document.location='/index.html'; //rechargement de l’application
+                    },500);
+                },200);
+            });
 
 
             return false;

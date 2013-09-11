@@ -86,7 +86,7 @@ module.exports = function(grunt) {
     travis: {
       options: {
         urls: [
-          'http://localhost:8765/tests/testrunner.html'
+          'http://localhost:8765/tests/foxympd.html'
         ]
       }
     },
@@ -95,14 +95,14 @@ module.exports = function(grunt) {
         reporter:'xunit',
         'output': 'results.xml',
         urls: [
-          'http://localhost:8765/tests/testrunner.html'
+          'http://localhost:8765/tests/foxympd.html'
         ]
       }
     },
     all: {
       options: {
         urls: [
-          'http://localhost:8765/tests/testrunner.html'
+          'http://localhost:8765/tests/foxympd.html'
         ]
       }
     }

@@ -56,14 +56,16 @@ define([
             coll.fetch({
                success:function(data)  {
 
-                    model=data.last();
                     if(data.size()===0) {
                        
-                       model = new SettingsModel({noLock:true});
+                       model = new SettingsModel({noLock:true,'test':'test'});
                        coll.add(model);
                        model.save();
                     
-                    
+                    } else {
+
+                        model=data.last();
+                        
                     }
 
                     registry.settings=model;
@@ -73,7 +75,6 @@ define([
             });
 
             return dfd.promise();
-
     };
 
 
@@ -82,7 +83,9 @@ define([
     var mpdStatusEl = onLineEL.children('.mpd'); 
 
     networkStatusEl.text('no network connection');
+
     var updateOnlineStatus = function (event) {
+
         var condition = navigator.onLine ? "online" : "offline";
 
         if(condition==='offline') {
@@ -104,14 +107,19 @@ define([
 
             case "hidden":
 
-                if(lock) lock.unlock();
+                if(registry.settings.get('noLock')===true) {
+                    if(lock) lock.unlock();
+                }
 
                 prom = registry.mpd.close();
                 break;
 
             case "visible":
             default:
-                lock = window.navigator.requestWakeLock('screen');
+
+                if(registry.settings.get('noLock')===true) {
+                    lock = window.navigator.requestWakeLock('screen');
+                }
 
                 if(!registry.mpd.connect_infos.length) break;
 
@@ -123,9 +131,7 @@ define([
 
                 break;
 
-
         }
-
 
     };
 
@@ -182,7 +188,6 @@ define([
                 });
 
 
-        visibilityAction();
         document.addEventListener("visibilitychange",function() {
             visibilityAction();
         });
@@ -212,6 +217,7 @@ define([
 
         setts.done(function() {
             check();
+            visibilityAction();
         });
 
         conn.fail(function() {
@@ -294,6 +300,7 @@ define([
     };
 
     return {
+        initSettings:initSettings,
         initialize:initialize,
         registry:registry,
         headerView:headerView,

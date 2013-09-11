@@ -38,36 +38,33 @@ define([
             });
 
 
-            it('should wait to have receive all data before running .onDataEnd',function() {
-
+            describe('mpd::onDataEnd',function() {
             
-                var mpd = new MPD(),r;
+                it('should be called only once all response data had been received',function() {
 
+                    var mpd = new MPD(),r;
 
-                //part 1
-                var part1 = '18:file: link/Zikmu/Weeds-Ost (copie)/fourth/27 - Chicha Libre - Sonido Amazonico - S04E10.mp3\n19:file: link/Incub/1TitLarme/Chopin - Marche Funèbre.mp3\n20:file: link/Incub/- Classique -/Classique - d';
-                var part2 = 'ivers/1. PisteAudio 01.mp3\n39:file: link/Incub/- Classique -/Classique - divers/21. PisteAudio 21.mp3\nOK\n';
+                    var part1 = '18:file: link/Zikmu/Weeds-Ost (copie)/fourth/27 - Chicha Libre - Sonido Amazonico - S04E10.mp3\n19:file: link/Incub/1TitLarme/Chopin - Marche Funèbre.mp3\n20:file: link/Incub/- Classique -/Classique - d';
+                    var part2 = 'ivers/1. PisteAudio 01.mp3\n39:file: link/Incub/- Classique -/Classique - divers/21. PisteAudio 21.mp3\nOK\n';
 
-                var i=0;
+                    var i=0;
 
-                sinon.spy(mpd,'onDataEnd');
+                    sinon.spy(mpd,'onDataEnd');
 
-                var dfd = $.Deferred();
+                    var dfd = $.Deferred();
 
+                    var buffer='';
 
-                var buffer='';
+                    r = {"data":mpd.utf8_encode(part1)};
+                    buffer = mpd.processMPDData(r,buffer,dfd,false); 
 
-                r = {"data":mpd.utf8_encode(part1)};
-                buffer = mpd.processMPDData(r,buffer,dfd,false); 
-
-                r = {"data":mpd.utf8_encode(part2)};
-                mpd.processMPDData(r,buffer,dfd,false); 
-
-
+                    r = {"data":mpd.utf8_encode(part2)};
+                    mpd.processMPDData(r,buffer,dfd,false); 
 
                     expect(mpd.onDataEnd.calledOnce).to.equal(true);
+                    
+                });
 
-                
             });
 
 
@@ -145,8 +142,5 @@ define([
 
 
         }); //fin describe controls
-      
-
-
   });
 });
