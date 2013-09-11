@@ -16,19 +16,28 @@
     You should have received a copy of the GNU General Public License
     along with FoxyMPD.  If not, see <http://www.gnu.org/licenses/>.
 */
-        define([],function() {
-        var db = {
-                 id: "foxympd",
-                    description: "The database for foxympd",
-                    migrations: [{
-                        version: 1,
-                        migrate: function (transaction, next) {
-                            var store = transaction.db.createObjectStore("connections");
-                            next();
+define([],function() {
+var db = {
+         id: "foxympd",
+            description: "The database for foxympd",
+            migrations: [
+                        {
+                            version: 1,
+                            migrate: function (transaction, next) {
+                                var store = transaction.db.createObjectStore("connections");
+                                next();
+                            }
+                        },
+                        {
+                            version: 2,
+                            migrate: function (transaction, next) {
+                                var store = transaction.db.createObjectStore("settings");
+                                next();
+                            }
                         }
-                    }]
-                };
+                        ]
+        };
 
-           var dbs = {"default":db};
-           return dbs;
+   var dbs = {"default":db};
+   return dbs;
 });

@@ -26,11 +26,13 @@ define([
     'appmanager',
 
     'collections/mpdconnections',
+    'collections/settings',
+    'models/settings',
 
     //plugins
     'backbone.subroute'
 
-], function($,_,Backbone,MPD,AppManager,MPDConnectionCollection) {
+], function($,_,Backbone,MPD,AppManager,MPDConnectionCollection,SettingsCollection,SettingsModel) {
 
 
     var noMPDCONNECTION=false;
@@ -45,6 +47,34 @@ define([
     var headerView={};
 
 
+
+    var initSettings = function() {
+
+            var dfd = $.Deferred();
+
+            coll = new SettingsCollection();
+            coll.fetch({
+               success:function(data)  {
+
+                    model=data.last();
+                    if(data.size()===0) {
+                       
+                       model = new SettingsModel({noLock:true});
+                       coll.add(model);
+                       model.save();
+                    
+                    
+                    }
+
+                    registry.settings=model;
+                    dfd.resolve();
+
+                }
+            });
+
+            return dfd.promise();
+
+    };
 
 
     var onLineEL = $('section[role=network-status]');
@@ -164,9 +194,24 @@ define([
 
 
         var conn = mpdconnect();
+        var setts = initSettings();
 
+
+        var needs = 2,iter=0;
+
+        var check = function() {
+            iter++;
+            if(iter===needs) {
+                dfd.resolve();
+            }
+            
+        };
         conn.done(function() {
-            dfd.resolve();
+            check();
+        });
+
+        setts.done(function() {
+            check();
         });
 
         conn.fail(function() {

@@ -104,6 +104,8 @@ define([
 
             var song;
             var self=this;
+
+
             $('.current').removeClass('current');
 
             app.registry.mpd.currentsong().done(function(result) {

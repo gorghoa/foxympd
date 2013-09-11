@@ -76,23 +76,25 @@ require([
 ],function($,_,Backbone,App, ControlsView, HeaderView,Router,AppManager) {
 
 
-        var promise = App.initialize();
+
+            var promise = App.initialize();
 
 
-        promise.always(function() {
+            promise.always(function() {
 
-            App.headerView = new  HeaderView();
-            App.headerView.render();
+                App.headerView = new  HeaderView();
+                App.headerView.render();
 
-            App.toolbarView = new ControlsView();
-            App.toolbarView.render();
+                App.toolbarView = new ControlsView();
+                App.toolbarView.render();
 
-            //            App.beginRouting();
-            App.registry.app_router= new Router.AppRouter();
-            App.registry.app_router.appManager=new AppManager();
-            Router.initialize(App.registry.app_router);
+                //            App.beginRouting();
+                App.registry.app_router= new Router.AppRouter();
+                App.registry.app_router.appManager=new AppManager();
+                Router.initialize(App.registry.app_router);
 
-        });
+            });
+
                         //registry.app_router.navigate('/connections/add');//,{trigger:true}); 
 
 });
