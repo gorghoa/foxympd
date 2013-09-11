@@ -1,6 +1,8 @@
 foxympd
 =======
 
+[![Build Status](https://travis-ci.org/gorghoa/foxympd.png?branch=master)](https://travis-ci.org/gorghoa/foxympd)
+
 A mpd client for firefox os
 
 Grunt tasks
