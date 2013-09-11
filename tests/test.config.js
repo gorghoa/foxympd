@@ -9,12 +9,16 @@ require.config({
     "backbone.mpd": "../src/js/libs/backbone/backbone.mpd",
     "timetools":"../src/js/libs/timetools",
 
+    dbs:"./dbs",
+
+    text:"vendor/text",
+    tpl:"vendor/tpl",
+
 
     //auth backends
     browserid:"https://browserid.org/include",
 
     mocha:"vendor/mocha",
-    sinon:"vendor/sinon",
     chai:"vendor/chai",
 
     foxy:"../src/js",

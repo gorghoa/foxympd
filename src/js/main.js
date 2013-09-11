@@ -1,5 +1,4 @@
 /*
- * w
     © barosofts, César & Rodrigue Villetard, 2013
 
     This file is part of FoxyMPD.
@@ -36,7 +35,11 @@ require.config({
     browserid:"https://browserid.org/include",
 
     //templates
-    templates: '../templates'
+    templates: '../templates',
+
+    //plugins
+    text:'libs/require/text',
+    tpl:'libs/require/tpl'
   },
 
   shim: {
@@ -57,6 +60,8 @@ require.config({
     "backbone.indexeddb": ['backbone'] 
 
   },
+
+
 
   tpl:  {
     extension: '.tpl'

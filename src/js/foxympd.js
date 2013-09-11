@@ -2876,6 +2876,8 @@ define("backbone", ["jquery","underscore"], (function (global) {
 
 
 /* ~~~~~~~~~~~ ATTRIBUTES ~~~~~~~~~~~~~~~~*/
+        okRegExp : new RegExp("OK\n$"),
+        koRegExp : new RegExp("^ACK"),
         socket:undefined,
         idlesocket:"",
         runstatus:"idle",
@@ -3033,6 +3035,50 @@ define("backbone", ["jquery","underscore"], (function (global) {
 
             return dfd.promise();
         },
+        onDataEnd : function() {
+
+            var self=this;
+            
+            self.stacked_mpd_commands=_.rest(self.stacked_mpd_commands);
+              
+            if(_.size(self.stacked_mpd_commands)===0) self.eventManager.trigger('stopsendingdata');
+            
+            self.resetRunningStatus();
+            self.run();
+
+        },
+        processMPDData:function(response,buffer,dfd,parse) {
+
+                var self=this;
+                buffer += self.utf8_decode(response.data);
+
+                /**
+                 * If an error is caught  
+                 */
+                if(buffer.match(self.koRegExp)) {
+
+                    console.error("error mpd",buffer);
+                    self.eventManager.trigger("mpd_error",buffer);
+
+                    self.onDataEnd();
+                    dfd.fail(buffer);
+
+                /**
+                 * Or, everything wend fine and mpd.js was able to catch the OK delimiting caracter  
+                 */
+                } else if (buffer.match(self.okRegExp)) {
+
+
+                    buffer= (parse) ? self.parse_mpd_response(buffer): buffer;
+
+                    self.onDataEnd();
+
+                    dfd.resolve({data:buffer});
+                }
+
+
+                return buffer;
+            },
         run:function() {
 
             var self=this;
@@ -3064,55 +3110,12 @@ define("backbone", ["jquery","underscore"], (function (global) {
 
             var dfd = action.dfd;
 
-
             var stack="";
-            var data="";
-            var endstring=new RegExp("OK\n");
-            var error_regexp = new RegExp('^ACK');
-
-
-
-            var onDataEnd = function() {
-            
-                self.stacked_mpd_commands=_.rest(self.stacked_mpd_commands);
-                  
-                if(_.size(self.stacked_mpd_commands)===0) self.eventManager.trigger('stopsendingdata');
-                
-                self.resetRunningStatus();
-                self.run();
-
-            };
+            var buffer="";
 
             self.socket.ondata=function(response) {
-
-                data += self.utf8_decode(response.data);
-
-                /**
-                 * If an error is caught  
-                 */
-                if(data.match(error_regexp)) {
-
-                    dfd.fail(data);
-                    console.error("error mpd",data);
-                    self.eventManager.trigger("mpd_error",data);
-
-                    onDataEnd();
-
-                /**
-                 * Or, everything wend fine and mpd.js was able to catch the OK delimiting caracter  
-                 */
-                } else if (data.match(endstring)) {
-
-                    data = (parse) ? self.parse_mpd_response(data): data;
-                    dfd.resolve({data:data});
-
-                    onDataEnd();
-                }
-
-
-                return;
+                buffer = self.processMPDData(response,buffer,dfd,parse);
             };
-
 
             self.socket.send(actionString);
             self.eventManager.trigger('sendingdata');
@@ -3227,6 +3230,7 @@ define("backbone", ["jquery","underscore"], (function (global) {
             
             var isp = stat.then(function() {
                 var result = self.solvePlaying(self.statusdata.state);
+
 
 
                 if(result===true) {
@@ -6884,10 +6888,10 @@ define('views/home',[
 
             var self=this;
 
-                        console.log('DONE!!!');
             self.playlist.fetch({
                 success: function(datum) {
                     if(datum) {
+
 
                         self.$el.html(tpl({datum:datum,timetools:timetools}));
 
@@ -7333,7 +7337,6 @@ define('router',[
 });
 
 /*
- * w
     © barosofts, César & Rodrigue Villetard, 2013
 
     This file is part of FoxyMPD.
@@ -7370,7 +7373,11 @@ require.config({
     browserid:"https://browserid.org/include",
 
     //templates
-    templates: '../templates'
+    templates: '../templates',
+
+    //plugins
+    text:'libs/require/text',
+    tpl:'libs/require/tpl'
   },
 
   shim: {
@@ -7391,6 +7398,8 @@ require.config({
     "backbone.indexeddb": ['backbone'] 
 
   },
+
+
 
   tpl:  {
     extension: '.tpl'
