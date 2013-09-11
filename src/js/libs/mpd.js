@@ -38,6 +38,8 @@
 
 
 /* ~~~~~~~~~~~ ATTRIBUTES ~~~~~~~~~~~~~~~~*/
+        okRegExp : new RegExp("OK\n$"),
+        koRegExp : new RegExp("^ACK"),
         socket:undefined,
         idlesocket:"",
         runstatus:"idle",
@@ -195,6 +197,51 @@
 
             return dfd.promise();
         },
+        onDataEnd : function() {
+
+            var self=this;
+            
+            self.stacked_mpd_commands=_.rest(self.stacked_mpd_commands);
+              
+            if(_.size(self.stacked_mpd_commands)===0) self.eventManager.trigger('stopsendingdata');
+            
+            self.resetRunningStatus();
+            self.run();
+
+        },
+        processMPDData:function(response,buffer,dfd,parse) {
+
+                var self=this;
+                buffer += self.utf8_decode(response.data);
+
+                /**
+                 * If an error is caught  
+                 */
+                if(buffer.match(self.koRegExp)) {
+
+                    dfd.fail(buffer);
+                    console.error("error mpd",buffer);
+                    self.eventManager.trigger("mpd_error",buffer);
+
+                    self.onDataEnd();
+
+                /**
+                 * Or, everything wend fine and mpd.js was able to catch the OK delimiting caracter  
+                 */
+                } else if (buffer.match(self.okRegExp)) {
+
+
+                    buffer= (parse) ? self.parse_mpd_response(buffer): buffer;
+
+
+                    dfd.resolve({data:buffer});
+
+                    self.onDataEnd();
+                }
+
+
+                return buffer;
+            },
         run:function() {
 
             var self=this;
@@ -226,55 +273,12 @@
 
             var dfd = action.dfd;
 
-
             var stack="";
-            var data="";
-            var endstring=new RegExp("OK\n");
-            var error_regexp = new RegExp('^ACK');
-
-
-
-            var onDataEnd = function() {
-            
-                self.stacked_mpd_commands=_.rest(self.stacked_mpd_commands);
-                  
-                if(_.size(self.stacked_mpd_commands)===0) self.eventManager.trigger('stopsendingdata');
-                
-                self.resetRunningStatus();
-                self.run();
-
-            };
+            var buffer="";
 
             self.socket.ondata=function(response) {
-
-                data += self.utf8_decode(response.data);
-
-                /**
-                 * If an error is caught  
-                 */
-                if(data.match(error_regexp)) {
-
-                    dfd.fail(data);
-                    console.error("error mpd",data);
-                    self.eventManager.trigger("mpd_error",data);
-
-                    onDataEnd();
-
-                /**
-                 * Or, everything wend fine and mpd.js was able to catch the OK delimiting caracter  
-                 */
-                } else if (data.match(endstring)) {
-
-                    data = (parse) ? self.parse_mpd_response(data): data;
-                    dfd.resolve({data:data});
-
-                    onDataEnd();
-                }
-
-
-                return;
+                buffer = self.processMPDData(response,buffer,dfd,parse);
             };
-
 
             self.socket.send(actionString);
             self.eventManager.trigger('sendingdata');

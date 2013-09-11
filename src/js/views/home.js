@@ -78,10 +78,10 @@ define([
 
             var self=this;
 
-                        console.log('DONE!!!');
             self.playlist.fetch({
                 success: function(datum) {
                     if(datum) {
+
 
                         self.$el.html(tpl({datum:datum,timetools:timetools}));
 

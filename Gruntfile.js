@@ -7,6 +7,7 @@ module.exports = function(grunt) {
     watch: {
      scripts: {
         files: ['./src/js/**/*.js','!./src/js/libs/**/*.js','./src/js/libs/*.js','!./src/js/foxympd.js','./src/templates/**/*.tpl','./tests/**/*.js'],
+        //tasks: ['connect','mocha_phantomjs:all']
         tasks: ['connect','mocha_phantomjs:all']
       },
       css: {
@@ -29,13 +30,13 @@ module.exports = function(grunt) {
         }
     },
 
-    mocha: {
-     browser: ['tests/**/*.html'],
-          options: {
-            reporter: 'Nyan', // Duh!
-            run: true
-          }   
-    },
+//    mocha: {
+ //    browser: ['tests/**/*.html'],
+  //        options: {
+   //         reporter: 'Nyan', // Duh!
+    //        run: true
+     //     }   
+   // },
 
 
     connect: {
@@ -86,7 +87,7 @@ module.exports = function(grunt) {
     travis: {
       options: {
         urls: [
-          'http://localhost:8765/testrunner.html'
+          'http://localhost:8765/tests/testrunner.html'
         ]
       }
     },
@@ -95,14 +96,14 @@ module.exports = function(grunt) {
         reporter:'xunit',
         'output': 'results.xml',
         urls: [
-          'http://localhost:8765/testrunner.html'
+          'http://localhost:8765/tests/testrunner.html'
         ]
       }
     },
     all: {
       options: {
         urls: [
-          'http://localhost:8765/testrunner.html'
+          'http://localhost:8765/tests/testrunner.html'
         ]
       }
     }
@@ -133,7 +134,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-compress');
   grunt.loadNpmTasks('grunt-contrib-connect');
-  grunt.loadNpmTasks('grunt-mocha');
+  //grunt.loadNpmTasks('grunt-mocha');
   grunt.loadNpmTasks('grunt-mocha-phantomjs');
 
   // Default task(s).
