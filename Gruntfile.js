@@ -1,12 +1,20 @@
 module.exports = function(grunt) {
 
+
+    var project_js_files = ['./src/js/**/*.js','!./src/js/libs/**/*.js','./src/js/libs/*.js','!./src/js/foxympd.js','./src/templates/**/*.tpl','./tests/**/*.js','!./tests/vendor/**/*.js'];
+
   // Project configuration.
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
 
+
+    jshint: {
+        all: project_js_files.concat(['!./**/*.tpl'])
+    },
+
     watch: {
      scripts: {
-        files: ['./src/js/**/*.js','!./src/js/libs/**/*.js','./src/js/libs/*.js','!./src/js/foxympd.js','./src/templates/**/*.tpl','./tests/**/*.js'],
+        files: project_js_files,
         //tasks: ['connect','mocha_phantomjs:all']
         tasks: ['connect','mocha_phantomjs:all']
       },
@@ -29,15 +37,6 @@ module.exports = function(grunt) {
           }
         }
     },
-
-//    mocha: {
- //    browser: ['tests/**/*.html'],
-  //        options: {
-   //         reporter: 'Nyan', // Duh!
-    //        run: true
-     //     }   
-   // },
-
 
     connect: {
       server: {
@@ -134,8 +133,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-compress');
   grunt.loadNpmTasks('grunt-contrib-connect');
-  //grunt.loadNpmTasks('grunt-mocha');
+  grunt.loadNpmTasks('grunt-notify');
   grunt.loadNpmTasks('grunt-mocha-phantomjs');
+  grunt.loadNpmTasks('grunt-contrib-jshint');
 
   // Default task(s).
   grunt.registerTask('build', ['clean','requirejs','compass','copy']);
