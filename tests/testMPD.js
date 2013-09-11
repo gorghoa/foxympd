@@ -15,7 +15,7 @@ define([
         test('is playing',function(assert) {
             var mpd = new MPD();
 
-            var currentStatus=undefined;
+            var currentStatus;
             mpd.status = function() {
                 var dfd=$.Deferred();
                 mpd.statusdata.state=currentStatus;
@@ -42,7 +42,7 @@ define([
             var mpd = new MPD(),result;
 
 
-            var currentStatus=undefined;
+            var currentStatus;
 
             mpd.status = function() {
                 var dfd=$.Deferred();
@@ -63,7 +63,7 @@ define([
 
 
             currentStatus='play';
-            mpd.statusdata.state=undefined;
+
             mpd.isPlaying().done(function(result) {
                 assert.strictEqual(result,true);
                 assert.strictEqual(mpd.statusdata.state,'play');

@@ -219,11 +219,11 @@
                  */
                 if(buffer.match(self.koRegExp)) {
 
-                    dfd.fail(buffer);
                     console.error("error mpd",buffer);
                     self.eventManager.trigger("mpd_error",buffer);
 
                     self.onDataEnd();
+                    dfd.fail(buffer);
 
                 /**
                  * Or, everything wend fine and mpd.js was able to catch the OK delimiting caracter  
@@ -233,10 +233,9 @@
 
                     buffer= (parse) ? self.parse_mpd_response(buffer): buffer;
 
+                    self.onDataEnd();
 
                     dfd.resolve({data:buffer});
-
-                    self.onDataEnd();
                 }
 
 
