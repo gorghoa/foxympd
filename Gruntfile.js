@@ -16,7 +16,7 @@ module.exports = function(grunt) {
      scripts: {
         files: project_js_files,
         //tasks: ['connect','mocha_phantomjs:all']
-        tasks: ['connect','mocha_phantomjs:all']
+        tasks: ['build','connect','mocha_phantomjs:all']
       },
       css: {
         files: '**/*.scss',

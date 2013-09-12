@@ -38,6 +38,7 @@ define([
             this.$el.html(tpl({model:this.model}));
 
             this.$el.find('#no-lock').attr('checked',(this.model.get('noLock')===true)?true:false);
+            this.$el.find('#show-covers').attr('checked',(this.model.get('showCovers')===true)?true:false);
 
         },
         events:{
@@ -47,8 +48,10 @@ define([
 
             var msn=$('[role=messenger]');
             var noLock = (this.$el.find('#no-lock').attr('checked')==='checked')?true:false;
+            var showCovers = (this.$el.find('#show-covers').attr('checked')==='checked')?true:false;
 
             this.model.set('noLock',noLock);
+            this.model.set('showCovers',showCovers);
 
 
             msn.text('saving…');

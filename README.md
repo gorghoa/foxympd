@@ -5,50 +5,27 @@ foxympd
 
 A mpd client for firefox os
 
-Grunt tasks
-===========
+Good to know Grunt tasks
+========================
 
+    grunt build
 
-watch
------
+Prepare for device installation
 
     grunt watch
     
-    
-Watch scss, tpl and js files changes, then recompile css and run r.js optimizer
+Watch scss, tpl and js files changes (both tests and src), then recompile css and run r.js optimizer
 
-compass
--------
+    grunt marketplace
 
-Run css compilation
+Build and zip, ready for publication
 
-compress
---------
-
-Create a zip from build folder
-
-copy
-----
-
-Prepare the app for publication, in build folder
-
-
-clean
------
-
-Erase build dir and compiled files
-
-
-requirejs
----------
-
-Run r.js optimizer, concat all js and compiled templates in one file situated in src/js/foxympd.js
 
 
 Test the app
 ============
 
-Install ffOS simulator, download the latest built archive, extract it, add the webapp.manifest to your simulator.
+Install ffOS simulator, download the latest realeased archive, extract it, add the webapp.manifest to your simulator.
 
 
 Build the app
@@ -74,6 +51,21 @@ Install dependencies :
 
     npm install
 
+
+Release notes
+=============
+
+0.0.4
+
+#. cover support (settingable)
+#. add settings screen
+#. add setting from screen locking
+
+0.0.3
+-----
+
+#. prevent screen from beeing locked
+#. add mpd connection error button
 
 
 

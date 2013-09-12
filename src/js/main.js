@@ -20,6 +20,7 @@
 
 
 require.config({
+  base_url: '/js',
   paths: {
     // Major libraries
     jquery: 'libs/jquery/jquery-min',
@@ -99,7 +100,5 @@ require([
                 Router.initialize(App.registry.app_router);
 
             });
-
-                        //registry.app_router.navigate('/connections/add');//,{trigger:true}); 
 
 });

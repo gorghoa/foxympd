@@ -58,7 +58,10 @@ define([
 
                     if(data.size()===0) {
                        
-                       model = new SettingsModel({noLock:true,'test':'test'});
+                       model = new SettingsModel({
+                                    noLock:true,
+                                    showCovers:true
+                                });
                        coll.add(model);
                        model.save();
                     

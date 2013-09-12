@@ -11,6 +11,10 @@
     <a href="<%= manifest.developer.url %>"><%= manifest.developer.url %></a>
 </p>
 
+<p>
+    Special thanks for pumpkin, author of  simplempc, for his very valuable review and his GPL code.
+</p>
+
 <hr/>
 <p>
     FoxyMPD is free software: you can redistribute it and/or modify

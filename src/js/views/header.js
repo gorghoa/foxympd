@@ -22,11 +22,14 @@ define([
     'backbone',
     'app',
 
+
     'timetools',
+
+    'libs/cover',
 
     'tpl!templates/header'
 
-],function($,_,Backbone,app,timetools,tpl) {
+],function($,_,Backbone,app,timetools,cover,tpl) {
 
 
 
@@ -58,11 +61,16 @@ define([
         },
         render: function() {
 
+            var self=this;
             var data={};
             var re=tpl(data);
 
             this.$el.html(re);
             this.updateTitles();
+
+            this.$el.find('.titles').click(function() {
+                self.$el.toggleClass('huge');
+            });
 
         },
         updateStatus:function(force) {
@@ -76,9 +84,20 @@ define([
 
             var song;
 
+            
+
             app.registry.mpd.currentsong().done(function(result) {
                 song = result.data;
                 self.setTitle(song.Title);
+
+
+                if(app.registry.settings.get('showCovers')===true) {
+                    var cover_container = $('<img />');
+                    cover(song.Artist,song.Album).done(function(cover_url) {
+                        cover_container.attr('src',cover_url);
+                        $('#cover_container').html(cover_container);
+                    });
+                }
             });
 
             app.registry.mpd.status().done(function(result) {

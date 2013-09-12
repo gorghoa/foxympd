@@ -1,8 +1,10 @@
+<div id="cover_container" />
 <menu type="toolbar"  id="menu_buttons">
 </menu>
 <nav>
     <a href="#"  class="lsf home">circle</a>
 </nav>
+
 
 <div class="titles">
 <h1>
