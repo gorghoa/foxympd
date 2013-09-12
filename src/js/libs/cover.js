@@ -44,7 +44,7 @@ define([
 
 
 
-                $.getJSON("http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&api_key=7facb82a2a573dd483d931044030e30c&artist=" + artist + "&format=json", function(data) {
+                $.getJSON("http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&api_key=29c5250b1bfc79c52af1357e42351948&artist=" + artist + "&format=json", function(data) {
 
                 var cover_url;
                 var cover_container = document.querySelector(".cover-container");
