@@ -55,14 +55,7 @@ define([
             roledata.empty();
 
 
-
-            try{
                 _.each(items,function(item) {
-                    i++;
-
-                    if(i>300) {
-                        throw 'too much'; 
-                    }
 
                     view = new detailedArtistView({model:item}); 
 
@@ -81,10 +74,6 @@ define([
 
                  }); 
 
-                 } catch (e) {
-
-
-                 }
 
             roledata.append(el);
         },
@@ -103,7 +92,7 @@ define([
             }).done(function() {
                 coll.fetch({
                     success:function(dati) {
-                        self.renderdata(dati.models);
+                        self.renderdata(_.sample(dati.models,200));
                     }
                 });
             });
