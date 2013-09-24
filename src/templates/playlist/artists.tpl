@@ -1,4 +1,4 @@
-<p class="info" role="info"><%= size %> items collected<br/>300 items max displayed</p>
+<p class="info" role="info"><%= size %> items collected<br/>200 items max displayed</p>
 
 <div role="infos" ></div>
 <div role="data">

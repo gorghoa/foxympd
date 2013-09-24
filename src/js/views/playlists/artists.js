@@ -46,14 +46,11 @@ define([
 
         renderdata:function(items) {
 
-
-
             var last=null,first,init,keys=[],view,percent=0,i=0,size=_.size(items),inter;
             var el = $('<ul/>');
 
             var roledata=this.$el.children('[role=data]');
             roledata.empty();
-
 
                 _.each(items,function(item) {
 

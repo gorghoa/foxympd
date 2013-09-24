@@ -24,54 +24,81 @@ define([
     'app',
 
     'views/playlists/artists',
+    'views/playlists/songs',
+    'views/playlists/albums',
 
     'tpl!templates/playlist/build'
 
 
-],function($,_,Backbone,app,defaultView,tplMain) {
+],function($,_,Backbone,app,artistsView, songsView, albumsView, tplMain) {
 
 
     var view = Backbone.View.extend({
 
-        initialize: function() {
-            this.current_view=new defaultView();
+        initialize:function() {
+            this.songsView = new songsView();
+            this.artistsView = new artistsView();
+            this.albumsView = new albumsView();
         },
         changeView:function(view_name,cb) {
 
             var self=this;
-            self.current_view.remove();
 
-            require(['views/playlists/'+view_name],function(view) {
-                self.current_view=new view();
+            if(self.current_view) {
+                self.current_view.undelegateEvents();
+            }
 
+            var view;
 
-                if(cb) {
-                    cb.apply(self,[self.current_view]);
-                }
+            switch(view_name) {
+                case 'songs':
+                    view = this.songsView;
+                    break;
 
-            });
+                case 'albums':
+                    view = this.albumsView;
+                    break;
+
+                default:
+                    view = this.artistsView;
+                    break;
+            }
+
+                self.current_view = view;
+                
+                self.current_view.delegateEvents();
 
             this.$el.find('.active').removeClass('active');
             this.$el.find('li[data-val='+view_name+']').addClass('active');
 
+
+            if(cb) {
+                cb.apply(self,[self.current_view]);
+            }
+
+
         },
+
         current_view:null,
+
         render: function() {
 
             var self=this;
 
+            self.$el.html(tplMain());
+
             done = $('<a id="done" class="lsf lsf-symbol">stock</a>');
             done.click(function() {self.current_view.done();});
+
             app.headerView.setActionButtons([done]);
 
             app.headerView.setTitle('Build a playlist');
 
 
-            this.$el.html(tplMain({current_view:this.current_view}));
-             
             this.changeView('artists',function(view) {
-               $('div[role=items]').html(view.render());
+                self.$el.find('[role=items]').html(view.render());
             });
+        
         },
 
         events:{
@@ -88,9 +115,10 @@ define([
         },
         chViewEvent:function(e) {
             var val = $(e.target).attr('data-val');
+            var self=this;
 
             this.changeView(val,function(view) {
-               $('div[role=items]').html(view.render());
+                self.$el.find('[role=items]').html(view.render());
             });
         }
 

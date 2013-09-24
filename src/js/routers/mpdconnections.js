@@ -25,11 +25,13 @@ define([
     'views/mpdconnections/edit',
     'views/mpdconnections/list',
 
+    'app',
+
     //plugins
     'backbone.subroute'
 
 
-], function($,_,Backbone,editView,listView) {
+], function($,_,Backbone,editView,App,listView) {
 
 
     var view;
@@ -47,13 +49,13 @@ define([
         edit : function() {
             var self=this;
             view = new editView();
-            self.appManager.showView(view);
+            App.registry.app_router.appManager.showView(view);
         },
 
         list : function() {
             var self=this;
             view = new listView();
-            self.appManager.showView(view);
+            App.registry.app_router.appManager.showView(view);
         }
 
     });

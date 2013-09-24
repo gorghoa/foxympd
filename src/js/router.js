@@ -61,11 +61,11 @@ define([
                   appManager.showView(view);
         });
         app_router.on("route:about", function (path) {
-				  var view = new aboutView();
+				  view = new aboutView();
                   appManager.showView(view);
         });
         app_router.on("route:settings", function (path) {
-				  var view = new settingsView();
+				  view = new settingsView();
                   appManager.showView(view);
         });
 

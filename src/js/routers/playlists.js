@@ -26,10 +26,12 @@ define([
     'views/playlists/save',
     'views/mpdconnections/list',
 
+    'app',
+
     //plugins
     'backbone.subroute'
 
-], function($,_,Backbone,buildView,saveView,listView) {
+], function($,_,Backbone,buildView,saveView,listView,App) {
 
 
     var router = Backbone.SubRoute.extend({
@@ -46,19 +48,19 @@ define([
         build : function() {
             var self=this;
             var view = new buildView();
-            self.appManager.showView(view);
+            App.registry.app_router.appManager.showView(view);
         },
 
         save : function() {
             var self=this;
             var view = new saveView();
-            self.appManager.showView(view);
+            App.registry.app_router.appManager.showView(view);
         },
 
         list : function() {
             var self=this;
             var view = new listView();
-            self.appManager.showView(view);
+            App.registry.app_router.appManager.showView(view);
         }
 
     });
