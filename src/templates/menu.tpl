@@ -1,4 +1,4 @@
-<div id="playingoptions">po</div>
+<div id="playingoptions"></div>
 <ul>
     <li><a role="button" href="#playlists/build"><span class="lsf icon">cart</span>build playlist</a></li>
     <li><a role="button" href="#playlists/save"><span class="lsf icon">save</span>save playlist</a></li>

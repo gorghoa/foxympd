@@ -1,6 +1,6 @@
 header {
     font-size:1rem;
-    background-image:linear-gradient(top,#000,rgba(255,255,255,0));
+    background-image:linear-gradient(top,#000,rgba(255,255,255,0), transparent 2rem);
 
 }
 section[role=region] header {
@@ -56,22 +56,50 @@ section[role=region] header .titles h1 {
 }
 #cover_container {
     position:absolute;
-    top:0;
     left:0;
     width:100%;
-    height:100%;
-    z-index:-1;
-    overflow:hidden;
+    background:#123;
+    color:#000;
+    top:1.7rem;
+    padding-top:1em;
+    z-index:-2;
     text-align:center;
 }
-#cover_container img {
 
+#cover_container img {
+    border-top:3px solid #FFF;
+    background:#FFF;
+    padding-bottom:3px;
+    box-shadow:0 0 0.6em;
+    position:absolute;
+    z-index:-3;
+    top:0rem;
+    display:block;
     width:100%;
 }
 
-.huge {
-    height:60%;
-    background-color:purple;
-    overflow:hidden;
-    box-shadow:0px 5px 5px #000;
+.discreet, #cover_container {
+    font-weight:bold;
+    color:#123;
+    background:transparent;
+    text-shadow:1px 1px 2px #FFF, -1px -1px 2px #FFF,0 0 10px #FFF;
+    padding:none;
+    margin:none;
+    height:none;
+    width:none;
+    border:none;
+
+}
+
+button.discreet {
+    color:transparent;
+    text-shadow: 1px 1px  1px #123,1px 1px 2px #FFF, -1px -1px 2px #FFF,0 0 10px #FFF;;
+    opacity:0.5;
+}
+
+cover_container.buttons {
+    position:absolute;
+    bottom:0;
+    margin-bottom:0.2rem;
+
 }

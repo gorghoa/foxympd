@@ -31,7 +31,7 @@ define([
     'backbone.subroute'
 
 
-], function($,_,Backbone,editView,App,listView) {
+], function($,_,Backbone,editView,listView,App) {
 
 
     var view;

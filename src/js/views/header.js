@@ -25,11 +25,11 @@ define([
 
     'timetools',
 
-    'libs/cover',
+    'tpl!templates/header',
 
-    'tpl!templates/header'
+    'views/header_extended'
 
-],function($,_,Backbone,app,timetools,cover,tpl) {
+],function($,_,Backbone,app,timetools,tpl,headerExtendedView) {
 
 
 
@@ -41,6 +41,8 @@ define([
         tick:null,
         elapsed:0,
         initialize:function() {
+
+            this.headerExtendedView=new headerExtendedView();
 
             var self=this;
             app.registry.mpd.on('player_changed',function(){
@@ -68,8 +70,11 @@ define([
             this.$el.html(re);
             this.updateTitles();
 
+            this.headerExtendedView.$el = this.$el.find('#cover_container');
+            this.headerExtendedView.render();
+
             this.$el.find('.titles').click(function() {
-                self.$el.toggleClass('huge');
+                self.headerExtendedView.toggle();
             });
 
         },
@@ -84,20 +89,11 @@ define([
 
             var song;
 
-            
-
             app.registry.mpd.currentsong().done(function(result) {
                 song = result.data;
                 self.setTitle(song.Title);
 
-
-                if(app.registry.settings.get('showCovers')===true) {
-                    var cover_container = $('<img />');
-                    cover(song.Artist,song.Album).done(function(cover_url) {
-                        cover_container.attr('src',cover_url);
-                        $('#cover_container').html(cover_container);
-                    });
-                }
+                self.headerExtendedView.songChanged(song);
             });
 
             app.registry.mpd.status().done(function(result) {
@@ -142,7 +138,6 @@ define([
         }
 
     });
-
 
     return view;
 

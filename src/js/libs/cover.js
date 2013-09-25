@@ -41,8 +41,6 @@ define([
 
             var dfd=$.Deferred();
 
-
-
                 $.getJSON("http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&api_key=29c5250b1bfc79c52af1357e42351948&artist=" + encodeURIComponent(artist) + "&format=json", function(data) {
 
                 var cover_url;
@@ -55,6 +53,7 @@ define([
                 });
 
                 if (cover_url) {
+
                     dfd.resolve(cover_url);
                 } else {
                     dfd.reject();

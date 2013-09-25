@@ -42,6 +42,7 @@ define([
             this.$el.html(tpl(data));
 
 
+
             this.playingoptionsView.$el=this.$el.find('#playingoptions');
             this.playingoptionsView.render();
 

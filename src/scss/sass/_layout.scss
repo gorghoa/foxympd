@@ -12,6 +12,7 @@ section[role=network-status]  {
 }
 
 section[role=network-status] .network {
+    display:block;
     text-shadow:1px 1px 1px #FFF;
     background:#FFF;
     border:3px solid red;
@@ -28,6 +29,7 @@ section[role=network-status] .span {
 
 section[role=network-status] .mpd{
     background:-moz-linear-gradient(top,rgb(110,0,10) 50%,rgb(60,0,10) 50%);
+    display:block;
     border:3px solid #FFF;
     border-radius:5px;
     padding:0.5rem 1rem;

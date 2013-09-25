@@ -35,6 +35,7 @@ define([
         currentView:null,
         showView : function(view) {
 
+            $('#cover_container *').slideUp(50);
 
             if (this.currentView) {
 

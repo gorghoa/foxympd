@@ -1,4 +1,6 @@
-<div id="cover_container" />
+<div id="cover_container">
+
+</div>
 <menu type="toolbar"  id="menu_buttons">
 </menu>
 <nav>
