@@ -44,6 +44,13 @@ define([
             }
         },
 
+        close: function() {
+
+            $('div[role=toolbar]').show();
+            $('section[role=network-status]').show();
+
+        },
+
         render: function() {
 
             $('div[role=toolbar]').hide();

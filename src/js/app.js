@@ -40,7 +40,8 @@ define([
             collections:{},
             user:null,
             dbs:{},
-            app_ticker:null //
+            app_ticker:null, //
+            settings:{}
     };
 
     var toolbarView={};
@@ -56,6 +57,7 @@ define([
             coll.fetch({
                success:function(data)  {
 
+
                     if(data.size()===0) {
                        
                        model = new SettingsModel({
@@ -70,6 +72,7 @@ define([
                         model=data.last();
                         
                     }
+
 
                     registry.settings=model;
                     dfd.resolve();
@@ -214,7 +217,7 @@ define([
             }
             
         };
-        conn.done(function() {
+        conn.always(function() {
             check();
         });
 
@@ -222,11 +225,6 @@ define([
             check();
             visibilityAction();
         });
-
-        conn.fail(function() {
-            dfd.reject();
-        });
-
 
         return dfd.promise();
         
