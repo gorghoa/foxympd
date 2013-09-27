@@ -21,9 +21,12 @@ define([
     'underscore',
     'backbone',
 
-    'backbone.mpd'
+    'dbs',
 
-],function($,_,Backbone,BackboneMpd) {
+    'backbone.mpd',
+    'backbone.indexeddb'
+
+],function($,_,Backbone,dbs,BackboneMpd) {
 
 
     /**
@@ -31,6 +34,8 @@ define([
      */
     var Model = BackboneMpd.Model.extend({
 
+        database:dbs['default'],
+        storeName:"artists",
 
         getDisplayName:function() {
             return this.get('Artist');

@@ -43,6 +43,7 @@
         socket:undefined,
         idlesocket:"",
         runstatus:"idle",
+        cached_stats:{'auie':'auie'},
         statusdata:{repeat:0,random:0,state:undefined,volume:undefined},
         is_open:false,
         eventManager:{},
@@ -56,6 +57,7 @@
 
             var ret={};
             var re = new RegExp("\n");
+            console.log('hum hum');
             data = data.split(re);
 
 
@@ -162,7 +164,7 @@
 
             this.socket.onopen=function() {
                 if(password) {
-                    self.stacked_mpd_commands = _.union([{command:"password "+password+"\n",parse:false,dfd:$.Deferred()}],self.stacked_mpd_commands);
+                    self.stacked_mpd_commands = _.union([{command:"password "+password+"\n",options:{parse:false,dfd:$.Deferred()}}],self.stacked_mpd_commands);
                 }
                 dfd.resolve();
                 self.eventManager.trigger('open');
@@ -177,11 +179,7 @@
 
             this.idlesocket.ondata=function(result) {
 
-
-                
-
                 self.idledata+=result.data;
-
 
                 if(result.data.match(/OK\n$/)) {
                     console.log("idledata",self.idledata);
@@ -214,6 +212,7 @@
                 var self=this;
                 buffer += self.utf8_decode(response.data);
 
+
                 /**
                  * If an error is caught  
                  */
@@ -231,6 +230,7 @@
                 } else if (buffer.match(self.okRegExp)) {
 
 
+                    console.log(parse,'parse');
                     buffer= (parse) ? self.parse_mpd_response(buffer): buffer;
 
                     self.onDataEnd();
@@ -266,11 +266,13 @@
             var actionString=action.command;
 
 
-            var parse = (action.parse!==undefined)?action.parse:true;
+            var parse = action.options.parse;
 
-            console.log("mpd execute : ",actionString);
+            console.log("mpd execute : ",actionString,'with parse',parse);
 
-            var dfd = action.dfd;
+            var dfd = action.options.dfd;
+
+
 
             var stack="";
             var buffer="";
@@ -284,13 +286,20 @@
         },
 
 
-        send:function(actionString,parse) {
+        send:function(actionString,options) {
 
             var dfd = $.Deferred();
 
+
+            options = options || {};
+
+            options.dfd = options.dfd || dfd;
+
+            options.parse = (options.parse!==undefined)? options.parse : true;
+
             var self=this;
 
-            self.stacked_mpd_commands.push({command:self.utf8_encode(actionString),parse:parse,dfd:dfd});
+            self.stacked_mpd_commands.push({command:self.utf8_encode(actionString),options:options});
 
             self.run();
 
@@ -367,11 +376,12 @@
 
 
         isPlaying:function() {
+            
             var self=this;
             var dfd = $.Deferred();
 
-            if(this.statusdata.state===undefined) {
 
+            if(this.statusdata.state===undefined) {
                 this.status().done(function(result) {
                     dfd.resolve(self.solvePlaying(self.statusdata.state));
                  });
@@ -407,33 +417,35 @@
             return dfd.promise();
 
         },
-        play:function() {
-            return this.send('play\n');
+        play:function(options) {
+            return this.send('play\n',options);
         },
-        next:function() {
-            return this.send('next\n');
+        next:function(opions) {
+            return this.send('next\n',options);
         },
-        previous:function() {
-            return this.send('previous\n');
-        },
-
-        playlistinfo:function() {
-            return this.send('playlistinfo\n',false);
+        previous:function(options) {
+            return this.send('previous\n',options);
         },
 
+        playlistinfo:function(options) {
 
-        loadPlaylist:function(val) {
-            this.send('load "'+val+'"\n');
+            options = options || {parse:false};
+            return this.send('playlistinfo\n',options);
         },
 
-        rmPlaylist:function(val) {
-            return this.send('rm "'+val+'"\n');
+
+        loadPlaylist:function(val,options) {
+            this.send('load "'+val+'"\n',options);
+        },
+
+        rmPlaylist:function(val,options) {
+            return this.send('rm "'+val+'"\n',options);
         },
 
         playlistExists:function(val) {
 
             var dfd=$.Deferred();
-            this.send('listplaylists\n',false).then(function(result) {
+            this.send('listplaylists\n',{parse:false}).then(function(result) {
             var re=new RegExp('^(.*): '+val+"$");
 
             result=result.data.split("\n");
@@ -505,26 +517,37 @@
         },
         status:function() {
             var self=this;
-            return this.send('status\n').then(function(result) {
+            var dd = this.send('status\n');
+            
+            dd.then(function(result) {
                 self.update_status(result.data); 
             });
+
+            return dd;
         },
-        currentsong:function() {
-            return this.send('currentsong\n');
+        currentsong:function(options) {
+            return this.send('currentsong\n',options);
         },
-        stats:function() {
-            return this.send('stats\n');
+        stats:function(options) {
+            var dfd = this.send('stats\n',options);
+
+            var self = this;
+
+            dfd.done(function(result) {
+                self.cached_stats = result.data;
+            });
+            return dfd;
         },
 
 
         /* misc */
 
-        ping:function(cb) {
-            return this.send('ping\n');
+        ping:function(options) {
+            return this.send('ping\n',options);
         },
 
-        clearPlaylist:function() {
-            return this.send('clear\n');
+        clearPlaylist:function(options) {
+            return this.send('clear\n',options);
         },
 
         /**
@@ -541,8 +564,9 @@
             var dfd = $.Deferred();
             var songs="";
 
-            var allArtists = function(artist) {
-                var p = self.send('find Artist "'+artist+'"\n',false);
+            var allArtists = function(artist,options) {
+                options = options || {parse:false};
+                var p = self.send('find Artist "'+artist+'"\n',options);
                 p.done(function(result) {
                     songs=songs+result.data;
                 });
@@ -581,7 +605,7 @@
             var songs="";
 
             var allAlbums = function(album) {
-                var p = self.send('find Album "'+album+'"\n',false);
+                var p = self.send('find Album "'+album+'"\n',{parse:false});
                 p.done(function(result) {
                     songs=songs+result.data;
                 });
@@ -603,14 +627,14 @@
                 });
                 cmd_list+="command_list_end\n";
 
-                self.send(cmd_list).done(dfd.resolve());
+                self.send(cmd_list,{parse:false}).done(dfd.resolve());
             });
 
             return dfd.promise();
         },
 
 
-        addSongs:function(songs) {
+        addSongs:function(songs,options) {
                 var cmd_list="command_list_begin\n";
                 var self=this;
                 data=songs;
@@ -620,11 +644,11 @@
                 });
                 cmd_list+="command_list_end\n";
 
-                self.send(cmd_list).done(dfd.resolve());
+                self.send(cmd_list,options).done(dfd.resolve());
         },
 
 
-        volumeDown:function() {
+        volumeDown:function(options) {
 
             var self=this;
             if(self.statusdata.volume===undefined) {
@@ -636,10 +660,10 @@
             var vol =self.statusdata.volume-10;
             if(vol<0) vol=0;
 
-            return this.send("setvol "+ vol +"\n");
+            return this.send("setvol "+ vol +"\n",options);
 
         },
-        volumeUp:function() {
+        volumeUp:function(options) {
 
             var self=this;
 
@@ -650,7 +674,7 @@
             }
             var vol =self.statusdata.volume+10;
             if(vol>100) vol=100;
-            return this.send("setvol "+ vol +"\n");
+            return this.send("setvol "+ vol +"\n",options);
 
         },
 
@@ -658,49 +682,54 @@
         isRandom:function() {
             return  (this.statusdata.random==="1")?true:false;
         },
-        toggleRandom:function() {
+        toggleRandom:function(options) {
             var msg = (this.isRandom())?0:1;
-            return this.send('random "'+msg+'"\n');
+            return this.send('random "'+msg+'"\n',options);
         },
         isRepeat:function() {
             return  (this.statusdata.repeat==="1")?true:false;
         },
-        toggleRepeat:function() {
+        toggleRepeat:function(options) {
             var msg = (this.isRepeat())?0:1;
-            return this.send('repeat "'+msg+'"\n',false);
+            options = options || {parse:false};
+            return this.send('repeat "'+msg+'"\n',options);
         },
 
 
         search:function(value) {
-            
-            return this.send('search any "'+value.toLowerCase()+'"\n',false);
+            options = options || {parse:false};
+            return this.send('search any "'+value.toLowerCase()+'"\n',options);
         },
 
         searchAlbum:function(value) {
-            this.send('search album "'+value.toLowerCase()+'"\n',false);
+            options = options || {parse:false};
+            this.send('search album "'+value.toLowerCase()+'"\n',options);
         },
 
-        searchArtist:function(value) {
-            this.send('search artist"'+value.toLowerCase()+'"\n',false);
+        searchArtist:function(value,options) {
+            options = options || {parse:false};
+            this.send('search artist"'+value.toLowerCase()+'"\n',options);
         },
 
-        searchTitle:function(value) {
-            this.send('search title"'+value.toLowerCase()+'"\n',false);
+        searchTitle:function(value,options) {
+            options = options || {parse:false};
+            this.send('search title"'+value.toLowerCase()+'"\n',options);
         },
 
-        listArtists:function() {
-            return this.send('list Artist\n',false);
+        listArtists:function(options) {
+            var ret = this.send('list Artist\n',options);
+            return ret;
         },
-        listAlbums:function() {
-            return this.send('list Album\n',false);
+        listAlbums:function(options) {
+            return this.send('list Album\n',options);
         },
 
-        shuffle:function() {
-            return this.send('shuffle\n');
+        shuffle:function(options) {
+            return this.send('shuffle\n',options);
         },
 /* ~~~~~~~~~~~ STORED PLAYLISTS ~~~~~~~~~~~~~~~~*/
-        listplaylists:function() {
-            return this.send('listplaylists\n',false);
+        listplaylists:function(options) {
+            return this.send('listplaylists\n',options);
         },
 
 

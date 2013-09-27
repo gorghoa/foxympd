@@ -21,21 +21,30 @@ define([
     'underscore',
     'backbone',
 
+    'dbs',
+
     'models/artist',
 
-    'backbone.mpd'
-],function($,_,Backbone,ArtistModel,BackboneMpd) {
+    'backbone.mpd',
+    'backbone.indexeddb'
+],function($,_,Backbone,dbs,ArtistModel,BackboneMpd) {
 
 
     var PlaylistCollection = BackboneMpd.Collection.extend({
 
             model:ArtistModel,
+            database:dbs['default'],
+            storeName:"artists",
+
+            stat:'artists',
+
             initialize:function(options) {
                 this.mpdconnection = options.mpdconnection; 
             },
             mpdmethodmapping:{
                 read:'listArtists'
             },
+
             parse:function(data) {
                 data=this.parse_mpd_response(data);
                 return data;
@@ -64,8 +73,6 @@ define([
 
                 });
 
-
-
             },
             comparator: function(mdl1,mdl2) {
                 
@@ -76,6 +83,8 @@ define([
             },
             parse_mpd_response:function(data,filter) {
 
+
+            console.log(data);
             filter = filter || function(){};
 
             var self=this;

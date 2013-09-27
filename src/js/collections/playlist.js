@@ -38,6 +38,7 @@ define([
 
 
                 var re = new RegExp("\n");
+                console.log('fuck',data);
                 data = data.split(re);
 
 

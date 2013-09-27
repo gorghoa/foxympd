@@ -34,6 +34,15 @@ var db = {
                                 var store = transaction.db.createObjectStore("settings");
                                 next();
                             }
+                        },
+                        {
+                            version: 3,
+                            migrate: function (transaction, next) {
+                                 transaction.db.createObjectStore("albums");
+                                 transaction.db.createObjectStore("artists");
+                                 transaction.db.createObjectStore("songs");
+                                next();
+                            }
                         }
                         ]
         };

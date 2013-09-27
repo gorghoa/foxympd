@@ -1,12 +1,12 @@
 define([
     'jquery',
     'underscore',
-    'backbone'
+    'backbone',
+
+    'backbone.indexeddb'
 ],function($,_,Backbone) {
 
     var MpdModel = Backbone.Model.extend({
-
-
 
         mpdconnection:null,
         sync:function(method, model, options) {
@@ -36,35 +36,90 @@ define([
         mpdmethodmapping:{
             read:'ping'
         },
-        sync:function(method, object, options) {
+
+        fetch_from_mpd: function(method,dfd) {
+
 
             var mpd_method = this.mpdmethodmapping[method];
             var mpd = this.mpdconnection;
 
-            var retour = mpd[mpd_method].apply(mpd);
+            return  mpd[mpd_method].apply(mpd,[{dfd:dfd,parse:false}]);
 
-            
-            retour.done(function(result) {
+        },
+        sync:function(method, object, options) {
 
-                var data = result.data;
-
-                var success = options.success;
-                if (success) success(data);
-                object.trigger('sync', object, data, options);
-
-            });
-
-            retour.fail(function(result) {
-                var error = options.error;
-                options.error = function(result) {
-                    if (error) error(result);
-                    object.trigger('error', object, data, options);
-                };
-            });
+            var self=this;
+            var retour=$.Deferred();
+            var dfd = $.Deferred();
 
 
 
+            if(method!=='read') return Backbone.Collection.prototype.sync.apply(this, arguments);
 
+            if(this.database===undefined) {
+
+                this.fetch_from_mpd(method,retour); 
+
+            } else {
+
+                var sss = parseInt(this.mpdconnection.cached_stats[this.stat],10);
+
+
+                try{
+                var result = Backbone.Collection.prototype.sync.apply(this, arguments);
+
+                } catch(e) 
+                {
+                    console.log('nersatuiensratuinratenrusieurtrset',e.message);
+                }
+
+
+                      
+                result.done(function(data) {
+                try{
+
+                    if(data===undefined || _.size(data) != sss) {
+                        self.fetch_from_mpd(method,retour);
+                    } else {
+                        retour =  result;
+                    }
+                } catch(e) 
+                {
+                    console.log('nersatuiensratuinratenrusieurtrset',e.message);
+                }
+                });
+            }
+                retour.done(function(result) {
+
+
+                    var data = result.data;
+
+                    dfd.resolve(data);
+
+                    var success = options.success;
+
+                    console.log('METH',object.mpdmethodmapping[method]);
+                    try{
+                        if (success) success(data);
+                    }catch(e) {
+                    console.log('errrrrrrrr',e.message);
+                    }
+
+                    object.trigger('sync', object, data, options);
+
+                });
+
+                retour.fail(function(result) {
+                    dfd.reject(result);
+                    var error = options.error;
+                    options.error = function(result) {
+                        if (error) error(result);
+                        object.trigger('error', object, result, options);
+                    };
+                });
+
+
+            return dfd;
         }
 
 

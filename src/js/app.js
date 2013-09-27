@@ -186,8 +186,8 @@ define([
                             });
 
         registry.mpd.on('open',function() {
-                            registry.mpd.run();
                             mpdStatusEl.text('connected').fadeOut(800);
+                            registry.mpd.run();
                             registry.app_ticker = setInterval(function() {
                                 registry.event_manager.trigger('tick');
                             },1000);
