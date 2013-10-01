@@ -417,7 +417,7 @@
         play:function(options) {
             return this.send('play\n',options);
         },
-        next:function(opions) {
+        next:function(options) {
             return this.send('next\n',options);
         },
         previous:function(options) {
