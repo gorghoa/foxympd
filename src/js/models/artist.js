@@ -23,7 +23,6 @@ define([
 
     'dbs',
 
-    'backbone.mpd',
     'backbone.indexeddb'
 
 ],function($,_,Backbone,dbs,BackboneMpd) {
@@ -32,7 +31,7 @@ define([
     /**
      * Represent a song setting 
      */
-    var Model = BackboneMpd.Model.extend({
+    var Model = Backbone.Model.extend({
 
         database:dbs['default'],
         storeName:"artists",

@@ -52,6 +52,7 @@ define([
             var roledata=this.$el.children('[role=data]');
             roledata.empty();
 
+                console.log('size',_.size(items));
                 _.each(items,function(item) {
 
                     view = new detailedArtistView({model:item}); 
@@ -82,6 +83,7 @@ define([
             self.$el.html(tplArtist({size:'~'}));
             var coll = this.collection;
 
+
             app.registry.mpd.stats().then(function(result) {
 
                 self.$el.html(tplArtist({size:result.data.artists}));
@@ -89,7 +91,7 @@ define([
             }).done(function() {
                 coll.fetch({
                     success:function(dati) {
-                        self.renderdata(_.sample(dati.models,200));
+                        self.renderdata(_.sample(dati.models,50));
                     }
                 });
             });
@@ -100,14 +102,12 @@ define([
 
         filtering:function(val,e) {
             console.log('filtering artists');
-             var self=this;
-
+            var self=this;
             var c=this.collection;
-            c.search(val,{
-                success:function(data) {
-                    self.renderdata(data.models);
-                }
-            });
+
+            self.renderdata(c.search(val));
+
+
         },
         'done':function(e) {
 

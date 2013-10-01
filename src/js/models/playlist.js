@@ -20,17 +20,20 @@ define([
     'jquery',
     'underscore',
     'backbone',
+    'dbs',
 
-    'backbone.mpd'
+    'backbone.indexeddb'
 
-],function($,_,Backbone,BackboneMpd) {
+],function($,_,Backbone,dbs) {
 
 
     /**
      * Represent a song setting 
      */
-    var Model = BackboneMpd.Model.extend({
+    var Model = Backbone.Model.extend({
 
+        database:dbs['default'],
+        storeName:"playlists"
 
     });
 

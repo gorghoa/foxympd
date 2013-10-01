@@ -44,13 +44,15 @@ define([
                 read:''
             },
             search:function(val,options) {
+
+
                 var self=this;
 
                 var success = (options.success) ? options.success : function() {};
 
                 this.mpdconnection.search(val).done(function(result) {
+
                     self.reset(self.parse_mpd_response(result.data));
-                
                     success(self);
 
                 });

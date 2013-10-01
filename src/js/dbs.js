@@ -41,6 +41,7 @@ var db = {
                                  transaction.db.createObjectStore("albums");
                                  transaction.db.createObjectStore("artists");
                                  transaction.db.createObjectStore("songs");
+                                 transaction.db.createObjectStore("playlists");
                                 next();
                             }
                         }

@@ -46,31 +46,27 @@ define([
             },
 
             parse:function(data) {
-                data=this.parse_mpd_response(data);
+
+                if(typeof data === 'object')  {
+                    data = _.first(data);
+                } else {
+
+                    data=this.parse_mpd_response(data);
+                }
                 return data;
             },
             search:function(val,options) {
-                var self=this;
-
-                var success = (options.success) ? options.success : function() {};
-
+         
                 var re = new RegExp(val.toLowerCase());
-
-
-                var prom = self.mpdconnection.listArtists();
-                
-                var filter = function(item) {
-                    return (item.toLowerCase().match(re))?false:true;
+                var filterFn = function(item) {
+                    return (item.get('Artist').toLowerCase().match(re))?true:false;
                 };
 
+                var filtered =  _.filter(this.models,filterFn);
 
-                prom.done(function(result) {
 
-                    var data = self.parse_mpd_response(result.data,filter);
-
-                    self.reset(data);
-                    success(self);
-
+                return _.sortBy(filtered,function(A) {
+                    return A.get('Artist');
                 });
 
             },
@@ -83,13 +79,12 @@ define([
             },
             parse_mpd_response:function(data,filter) {
 
-
-            console.log(data);
             filter = filter || function(){};
 
             var self=this;
 
             var ret=[];
+
 
             var re = new RegExp("\n");
             data = data.split(re);
@@ -128,4 +123,3 @@ define([
     return PlaylistCollection;
 
 });
-

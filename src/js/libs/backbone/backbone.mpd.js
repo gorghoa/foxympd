@@ -6,29 +6,6 @@ define([
     'backbone.indexeddb'
 ],function($,_,Backbone) {
 
-    var MpdModel = Backbone.Model.extend({
-
-        mpdconnection:null,
-        sync:function(method, model, options) {
-
-            resp =  [{salut:'manu'}];
-
-            var success = options.success;
-            options.success = function(resp) {
-                if (success) success(resp);
-                /*object.trigger('sync', object, resp, options);*/
-            };
-
-            var error = options.error;
-            options.error = function(resp) {
-                if (error) error(resp);
-                /*object.trigger('error', object, resp, options);*/
-            };
-
-        }
-
-
-    });
 
     var MpdCollection = Backbone.Collection.extend({
 
@@ -36,76 +13,91 @@ define([
         mpdmethodmapping:{
             read:'ping'
         },
+        parent:Backbone.Collection.prototype,
+        save:function() {
 
+        },
         fetch_from_mpd: function(method,dfd) {
 
 
             var mpd_method = this.mpdmethodmapping[method];
             var mpd = this.mpdconnection;
 
+
+            console.log(mpd_method);
+
             return  mpd[mpd_method].apply(mpd,[{dfd:dfd,parse:false}]);
 
         },
-        sync:function(method, object, options) {
+        fetch:function(options) {
+
 
             var self=this;
             var retour=$.Deferred();
             var dfd = $.Deferred();
 
-
-
-            if(method!=='read') return Backbone.Collection.prototype.sync.apply(this, arguments);
-
             if(this.database===undefined) {
 
-                this.fetch_from_mpd(method,retour); 
+                this.fetch_from_mpd('read',retour); 
 
             } else {
 
                 var sss = parseInt(this.mpdconnection.cached_stats[this.stat],10);
 
-
                 try{
-                var result = Backbone.Collection.prototype.sync.apply(this, arguments);
+
+                    var parent_options = {
+                        success:function(data) {
+
+                                if(typeof data===undefined || _.size(data) < 1) {
+                                    console.log('fetching from mpd');
+                                    self.fetch_from_mpd('read',retour);
+
+                                } else {
+                                    console.log('fetching from indexeddb');
+                                    retour.resolve(self);
+                                }
+
+                        }
+
+                    };
+
+                    var result = self.parent.fetch.apply(this, [parent_options]);
 
                 } catch(e) 
                 {
-                    console.log('nersatuiensratuinratenrusieurtrset',e.message);
+                    console.log('Backbone.mpd error',e.message);
                 }
 
-
-                      
-                result.done(function(data) {
-                try{
-
-                    if(data===undefined || _.size(data) != sss) {
-                        self.fetch_from_mpd(method,retour);
-                    } else {
-                        retour =  result;
-                    }
-                } catch(e) 
-                {
-                    console.log('nersatuiensratuinratenrusieurtrset',e.message);
-                }
-                });
             }
+
                 retour.done(function(result) {
 
-
                     var data = result.data;
+                    var success = options.success;
+
+                    if(typeof data === 'undefined')
+                    {
+                        if (success) success(self);
+                        dfd.resolve(self.models);
+                        return;
+                    }
 
                     dfd.resolve(data);
 
-                    var success = options.success;
 
-                    console.log('METH',object.mpdmethodmapping[method]);
-                    try{
-                        if (success) success(data);
-                    }catch(e) {
-                    console.log('errrrrrrrr',e.message);
+                    parsed = self.parse(data);
+
+                    self.set(parsed);
+
+
+                    if(self.database) {
+                        self.parent.sync('create',self, {
+                                success:function() {}
+                        });
                     }
 
-                    object.trigger('sync', object, data, options);
+                    if (success) success(self);
 
                 });
 
@@ -125,9 +117,9 @@ define([
 
     });
 
+
+
     return {
-        Model:MpdModel,
         Collection:MpdCollection
     };
-
 });

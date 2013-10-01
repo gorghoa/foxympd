@@ -49,6 +49,7 @@ require.config({
 
 require([
     'mpd/mpd',
+    'mpd/backbone',
 
     //User Interface stuffs
     'ui/mpdconnections'

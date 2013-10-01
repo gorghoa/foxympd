@@ -46,10 +46,10 @@ define([
             var request  = $(form).children("input[name=request]").val();
 
             var self=this;
-            app.registry.mpd.send(request+'\n',false).done(function(result) {
+            app.registry.mpd.send(request+'\n',{parse:false}).done(function(result) {
                 self.$el.children('#log').html(result.data.split("\n").join("<br/>"));
             });
-            app.registry.mpd.send(request+'\n',false).fail(function(result) {
+            app.registry.mpd.send(request+'\n',{parse:false}).fail(function(result) {
                 self.$el.children('#log').html(result.data.split("\n").join("<br/>"));
             });
 

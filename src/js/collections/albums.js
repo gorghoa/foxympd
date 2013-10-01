@@ -21,15 +21,22 @@ define([
     'underscore',
     'backbone',
 
+    'dbs',
+
     'models/album',
 
     'backbone.mpd'
-],function($,_,Backbone,AlbumModel,BackboneMpd) {
+],function($,_,Backbone,dbs,AlbumModel,BackboneMpd) {
 
 
     var PlaylistCollection = BackboneMpd.Collection.extend({
 
             model:AlbumModel,
+            database:dbs['default'],
+            storeName:"albums",
+
+            stat:'artists',
+
             initialize:function(options) {
                 this.mpdconnection = options.mpdconnection; 
             },
@@ -37,7 +44,12 @@ define([
                 read:'listAlbums'
             },
             parse:function(data) {
-                data=this.parse_mpd_response(data);
+                if(typeof data === 'object')  {
+                    data = _.first(data);
+                } else {
+
+                    data=this.parse_mpd_response(data);
+                }
                 return data;
             },
             comparator: function(mdl1,mdl2) {
@@ -48,30 +60,19 @@ define([
                     return ( (first > second && first) || !second)?1:-1;
             },
             search:function(val,options) {
-                var self=this;
 
-                var success = (options.success) ? options.success : function() {};
-
+                try{
                 var re = new RegExp(val.toLowerCase());
-
-
-                var prom = self.mpdconnection.listAlbums();
-                
-                var filter = function(item) {
-                    return (item.toLowerCase().match(re))?false:true;
+                var filterFn = function(item) {
+                    return (item.get('Album').toLowerCase().match(re))?true:false;
                 };
 
+                return  _.filter(this.models,filterFn);
 
-                prom.done(function(result) {
-
-                    var data = self.parse_mpd_response(result.data,filter);
-
-                    self.reset(data);
-                    success(self);
-
-                });
-
-
+                } catch(e) {
+                    console.log(e.message);
+                }
+                return '';
 
             },
             parse_mpd_response:function(data,filter) {

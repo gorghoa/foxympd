@@ -102,31 +102,17 @@ define([
 
         },
         filtering:function(val, e) {
-
-            if(val.length<4) return;
             console.log('filtering albums');
             var self=this;
-
             var c=this.collection;
-
-            c.search(val,{
-                success:function(data) {
-                    self.renderdata(data.models);
-                }
-            });
-
+            self.renderdata(c.search(val));
         },
 
         filtering:function(val,e) {
             console.log('filtering albums');
-             var self=this;
-
+            var self=this;
             var c=this.collection;
-            c.search(val,{
-                success:function(data) {
-                    self.renderdata(data.models);
-                }
-            });
+            self.renderdata(c.search(val));
         },
         'done':function(e) {
 

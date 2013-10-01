@@ -34,11 +34,13 @@ define([
             mpdmethodmapping:{
                 read:'playlistinfo'
             },
+            parse:function(data) {
+                return this.parse_mpd_response(data);
+            },
             parse_mpd_response:function(data) {
 
 
                 var re = new RegExp("\n");
-                console.log('fuck',data);
                 data = data.split(re);
 
 

@@ -29,10 +29,12 @@ define([
     'collections/settings',
     'models/settings',
 
+    'dbs',
+
     //plugins
     'backbone.subroute'
 
-], function($,_,Backbone,MPD,AppManager,MPDConnectionCollection,SettingsCollection,SettingsModel) {
+], function($,_,Backbone,MPD,AppManager,MPDConnectionCollection,SettingsCollection,SettingsModel,dbs) {
 
 
     var noMPDCONNECTION=false;
@@ -41,7 +43,8 @@ define([
             user:null,
             dbs:{},
             app_ticker:null, //
-            settings:{}
+            settings:{},
+            current_connection:null
     };
 
     var toolbarView={};
@@ -221,6 +224,10 @@ define([
             check();
         });
 
+        conn.done(function(model) {
+                registry.current_connection=model;
+        });
+
         setts.done(function() {
             check();
             visibilityAction();
@@ -231,11 +238,51 @@ define([
 
     };
 
+
+    var clearCache = function() {
+
+    console.log('clearing cache');
+
+    var defaultDB = dbs['default']; 
+        var initDb=function() {
+
+
+            request=window.indexedDB.open(defaultDB['id'],_.size(defaultDB['migrations']));
+
+            request.onerror=function(event) {
+                console.error('cant init db');
+            };
+
+            request.onsuccess = function(event) {
+                db = request.result;
+                console.log('init db ok');
+                var transaction = db.transaction(['artists'], 'readwrite');
+                var object_store=transaction.objectStore('artists');
+                object_store.clear();
+
+                transaction = db.transaction(['songs'], 'readwrite');
+                object_store=transaction.objectStore('songs');
+                object_store.clear();
+
+                transaction = db.transaction(['albums'], 'readwrite');
+                object_store=transaction.objectStore('albums');
+                object_store.clear();
+            };
+
+        };
+
+        initDb();
+
+
+    };
+
     var mpdconnect=function(model) {
 
         var dfd = $.Deferred();
         var promise = dfd.promise();
         var mpd=registry.mpd;
+
+
 
 
         var doConnect = function (model,promise) {
@@ -246,9 +293,16 @@ define([
                 }
 
 
+
+                var last_db_update = (model.get('stats')) ? model.get('stats')['db_update'] : 0;
+
                 mpd.once('open',function() {
                     mpd.stats().done(function(result) {
                         var stats=result.data;
+
+                        if(stats['db_update'] != last_db_update) {
+                            clearCache();
+                        }
                         model.set('stats',stats);
                         model.set('last_connection',new Date().getTime());
                         model.save();
@@ -256,7 +310,7 @@ define([
                 });
                 mpd.setConnectInfos(model.attributes);
                 mpd.connect();
-                dfd.resolve();
+                dfd.resolve(model);
 
                 return promise;
 

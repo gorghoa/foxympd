@@ -20,16 +20,18 @@ define([
     'jquery',
     'underscore',
     'backbone',
+    'dbs'
 
-    'backbone.mpd'
-
-],function($,_,Backbone,BackboneMpd) {
+],function($,_,Backbone,dbs) {
 
 
     /**
      * Represent a song setting 
      */
-    var Model = BackboneMpd.Model.extend({
+    var Model = Backbone.Model.extend({
+
+        database:dbs['default'],
+        storeName:"songs",
 
         getDisplayName:function() {
             return this.get('Title');

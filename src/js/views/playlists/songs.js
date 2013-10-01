@@ -108,6 +108,8 @@ define([
 
             c.search(val,{
                 success:function(data) {
+
+                     
                     self.renderdata(data.models);
                 }
             });

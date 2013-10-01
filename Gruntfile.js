@@ -1,7 +1,7 @@
 module.exports = function(grunt) {
 
 
-    var project_js_files = ['./src/js/**/*.js','!./src/js/libs/**/*.js','./src/js/libs/*.js','!./src/js/foxympd.js','./src/templates/**/*.tpl','./tests/**/*.js','!./tests/vendor/**/*.js'];
+    var project_js_files = ['./src/js/**/*.js','!./src/js/libs/**/*.js','./src/js/libs/*.js','./src/js/libs/backbone/backbone.mpd.js','!./src/js/foxympd.js','./src/templates/**/*.tpl','./tests/**/*.js','!./tests/vendor/**/*.js'];
 
   // Project configuration.
   grunt.initConfig({

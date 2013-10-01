@@ -82,7 +82,6 @@ define([
                 success: function(datum) {
                     if(datum) {
 
-
                         self.$el.html(tpl({datum:datum,timetools:timetools}));
 
                         if(!datum.size()) {

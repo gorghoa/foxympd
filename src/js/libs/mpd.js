@@ -57,7 +57,6 @@
 
             var ret={};
             var re = new RegExp("\n");
-            console.log('hum hum');
             data = data.split(re);
 
 
@@ -230,7 +229,6 @@
                 } else if (buffer.match(self.okRegExp)) {
 
 
-                    console.log(parse,'parse');
                     buffer= (parse) ? self.parse_mpd_response(buffer): buffer;
 
                     self.onDataEnd();
@@ -268,7 +266,7 @@
 
             var parse = action.options.parse;
 
-            console.log("mpd execute : ",actionString,'with parse',parse);
+            console.log("mpd execute : ",actionString);
 
             var dfd = action.options.dfd;
 
@@ -403,13 +401,12 @@
             var isp = stat.then(function() {
                 var result = self.solvePlaying(self.statusdata.state);
 
-
-
                 if(result===true) {
                     return self.pause(result);
                 } else {
                     return self.play();
                 }
+
             }).done(function() {
                 dfd.resolve('ok');
             });
@@ -534,6 +531,7 @@
             var self = this;
 
             dfd.done(function(result) {
+
                 self.cached_stats = result.data;
             });
             return dfd;
@@ -696,7 +694,7 @@
         },
 
 
-        search:function(value) {
+        search:function(value,options) {
             options = options || {parse:false};
             return this.send('search any "'+value.toLowerCase()+'"\n',options);
         },
