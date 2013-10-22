@@ -2,7 +2,7 @@ define([
   'jquery',
   'chai',
 
-  'foxy/libs/mpd'
+  'libs/mpd'
 
 ], function($,chai,MPD) {
   'use strict';

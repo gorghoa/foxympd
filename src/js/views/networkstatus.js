@@ -70,27 +70,28 @@ define([
             return (_.size(app.registry.mpd.connect_infos))?true:false;
         },
 
+        events : {
+            '.mpd click':'redirect'
+        },
+
+        redirect: function() {
+            var noMPDCONNECTION = !this.isMPDConnection();
+            if(noMPDCONNECTION===true) app.registry.app_router.navigate('connections/add',{trigger:true});
+            else app.registry.mpd.connect(); 
+        },
         updateMPDStatusButton:function() {
-            var noMPDCONNECTION = this.isMPDConnection();
+            var noMPDCONNECTION = !this.isMPDConnection();
+
             var errtext = (!noMPDCONNECTION) ?'mpd connection error, press to retry':'no mpd connection, press to add one' ;
 
-            var networkStatusEl = this.$el.children('.network');
             var mpdStatusEl = this.$el.children('.mpd'); 
 
             mpdStatusEl.text(errtext);
-            mpdStatusEl.unbind('click');
 
-            mpdStatusEl.click(function() {
-
-                if(noMPDCONNECTION===true) registry.app_router.navigate('connections/add',{trigger:true});
-                else registry.mpd.connect(); 
-
-            });
-
-
+            this.undelegateEvents();
+            this.delegateEvents();
         },
         updateOnlineStatus : function (event) {
-
             var condition = navigator.onLine ? "online" : "offline";
 
             var networkStatusEl = this.$el.children('.network');

@@ -51,39 +51,51 @@ define([
     var headerView={};
 
 
+    var initializers={
 
-    var initSettings = function() {
-
-            var dfd = $.Deferred();
-
-            coll = new SettingsCollection();
-            coll.fetch({
-               success:function(data)  {
+        initialize_event_manager:function() {
+            registry.event_manager = {};
+            _.extend(registry.event_manager,Backbone.Events);
+        },
 
 
-                    if(data.size()===0) {
-                       
-                       model = new SettingsModel({
-                                    noLock:true,
-                                    showCovers:true
-                                });
-                       coll.add(model);
-                       model.save();
-                    
-                    } else {
+        initialize_mpd:function() {
+            registry.mpd=new MPD();
+        },
 
-                        model=data.last();
+        initSettings : function() {
+
+                var dfd = $.Deferred();
+
+                coll = new SettingsCollection();
+                coll.fetch({
+                   success:function(data)  {
+
+
+                        if(data.size()===0) {
+                           
+                           model = new SettingsModel({
+                                        noLock:true,
+                                        showCovers:true
+                                    });
+                           coll.add(model);
+                           model.save();
                         
+                        } else {
+
+                            model=data.last();
+                            
+                        }
+
+
+                        registry.settings=model;
+                        dfd.resolve();
+
                     }
+                });
 
-
-                    registry.settings=model;
-                    dfd.resolve();
-
-                }
-            });
-
-            return dfd.promise();
+                return dfd.promise();
+        }
     };
 
 
@@ -132,12 +144,9 @@ define([
 
 
         var dfd= $.Deferred();
-
-        registry.mpd=new MPD();
-
-        registry.event_manager = {};
-        _.extend(registry.event_manager,Backbone.Events);
-
+   
+        initializers.initialize_mpd();
+        initializers.initialize_event_manager();
 
         registry.mpd.on('mpd_error',function(data) {
             alert("mpd error:\n"+data+i);
@@ -165,7 +174,7 @@ define([
 
 
         var conn = mpdconnect();
-        var setts = initSettings();
+        var setts = initializers.initSettings();
 
 
         var needs = 2,iter=0;
@@ -305,13 +314,13 @@ define([
     };
 
     return {
-        initSettings:initSettings,
         initialize:initialize,
         registry:registry,
         headerView:headerView,
         toolbarView:toolbarView,
         /*beginRouting:beginRouting,*/
-        mpdconnect:mpdconnect
+        mpdconnect:mpdconnect,
+        initializers:initializers
     };
 
 });

@@ -3,7 +3,7 @@ define([
   'chai',
 
   'backbone.mpd',
-  'foxy/libs/mpd'
+  'libs/mpd'
 
 ], function($,chai,backboneMPD,MPD) {
   'use strict';

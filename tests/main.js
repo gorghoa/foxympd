@@ -1,27 +1,26 @@
 require.config({
 
+    baseUrl:"../src/js",
     paths:{
-    jquery: '../src/js/libs/jquery/jquery-min',
-    underscore: '../src/js/libs/underscore/underscore-min', // https://github.com/amdjs
-    backbone: '../src/js/libs/backbone/backbone', // https://github.com/amdjs
-    "backbone.subroute": "../src/js/libs/backbone/backbone.subroute",
-    "backbone.indexeddb": "../src/js/libs/backbone/backbone.indexeddb",
-    "backbone.mpd": "../src/js/libs/backbone/backbone.mpd",
-    "timetools":"../src/js/libs/timetools",
+    jquery: 'libs/jquery/jquery-min',
+    underscore: 'libs/underscore/underscore-min', // https://github.com/amdjs
+    backbone: 'libs/backbone/backbone', // https://github.com/amdjs
+    "backbone.subroute": "libs/backbone/backbone.subroute",
+    "backbone.indexeddb": "libs/backbone/backbone.indexeddb",
+    "backbone.mpd": "libs/backbone/backbone.mpd",
+    "timetools":"libs/timetools",
 
     dbs:"./dbs",
 
-    text:"vendor/text",
-    tpl:"vendor/tpl",
+    tests:"../../tests",
+
+    //plugins
+    text:'libs/require/text',
+    tpl:'libs/require/tpl',
 
 
-    //auth backends
-    browserid:"https://browserid.org/include",
-
-    mocha:"vendor/mocha",
-    chai:"vendor/chai",
-
-    foxy:"../src/js",
+    mocha:"../../tests/vendor/mocha",
+    chai:"../../tests/vendor/chai",
 
     //templates
     templates: '../templates'
@@ -38,23 +37,24 @@ require.config({
     jquery : {
         exports:'jQuery'
     },
-    browserid: {
-        exports:'navigator'
-    },
-    "backbone.subroute": ['backbone'] ,
-    "backbone.indexeddb": ['backbone'] 
-
-  }
+    "backbone.subroute": ['backbone'],
+    "backbone.indexeddb": ['backbone'],
+  },
+    tpl:  {
+      extension: '.tpl'
+    }
 });
 
 require([
-    'mpd/mpd',
-    'mpd/backbone',
+
+    'tests/mpd/mpd',
+    'tests/mpd/backbone',
 
     //User Interface stuffs
-    'ui/mpdconnections'
+    'tests/views/networkstatus'
 
 ], function() {
+
   if (window.mochaPhantomJS) { mochaPhantomJS.run(); }
   else { mocha.run(); }
 });
