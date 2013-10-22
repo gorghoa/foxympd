@@ -87,24 +87,6 @@ define([
     };
 
 
-    var onLineEL = $('section[role=network-status]');
-    var networkStatusEl = $('section[role=network-status]').children('.network');
-    var mpdStatusEl = onLineEL.children('.mpd'); 
-
-    networkStatusEl.text('no network connection');
-
-    var updateOnlineStatus = function (event) {
-
-        var condition = navigator.onLine ? "online" : "offline";
-
-        if(condition==='offline') {
-            networkStatusEl.show();
-        } else {
-            networkStatusEl.hide();
-        }
-    };
-
-
 
     /**
      * turn off locking screen and mpd connection when the app is not visible 
@@ -144,22 +126,6 @@ define([
 
     };
 
-    var updateMPDStatusButton=function() {
-        var errtext = (!noMPDCONNECTION) ?'mpd connection error, press to retry':'no mpd connection, press to add one' ;
-
-
-        mpdStatusEl.text(errtext);
-        mpdStatusEl.unbind('click');
-
-        mpdStatusEl.click(function() {
-
-            if(noMPDCONNECTION===true) registry.app_router.navigate('connections/add',{trigger:true});
-            else registry.mpd.connect(); 
-
-        });
-
-
-    };
 
     var initialize=function() {
 
@@ -167,15 +133,10 @@ define([
 
         var dfd= $.Deferred();
 
-
         registry.mpd=new MPD();
 
         registry.event_manager = {};
         _.extend(registry.event_manager,Backbone.Events);
-
-
-
-        updateMPDStatusButton();
 
 
         registry.mpd.on('mpd_error',function(data) {
@@ -184,14 +145,11 @@ define([
 
         registry.mpd.on('close',function() {
                                         clearInterval(registry.app_ticker);
-                                        updateMPDStatusButton();
-                                        mpdStatusEl.show();
                             });
 
         registry.mpd.on('open',function() {
-                            mpdStatusEl.text('connected').fadeOut(800);
-                            registry.mpd.run();
-                            registry.app_ticker = setInterval(function() {
+                                registry.mpd.run();
+                                registry.app_ticker = setInterval(function() {
                                 registry.event_manager.trigger('tick');
                             },1000);
                 });
@@ -202,9 +160,8 @@ define([
         });
   
 
-        updateOnlineStatus();
-        document.addEventListener('online',  updateOnlineStatus);
-        document.addEventListener('offline', updateOnlineStatus);
+        document.addEventListener('online',  registry.event_manager.trigger('online'));
+        document.addEventListener('offline',  registry.event_manager.trigger('offline'));
 
 
         var conn = mpdconnect();
@@ -334,14 +291,7 @@ define([
                success:function(data)  {
 
                 model=data.last();
-                if(data.size()===0) noMPDCONNECTION = true;
-                else noMPDCONNECTION = false;
-
-                updateMPDStatusButton();
-
                 return doConnect(model,promise);
-
-
                }
             });
         } catch (e) {

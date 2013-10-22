@@ -77,9 +77,10 @@ require([
     'app',
     'views/controls',
     'views/header',
+    'views/networkstatus',
     'router',
     'appmanager'
-],function($,_,Backbone,App, ControlsView, HeaderView,Router,AppManager) {
+],function($,_,Backbone,App, ControlsView, HeaderView,NetworkstatusView,Router,AppManager) {
 
 
 
@@ -94,9 +95,14 @@ require([
                 App.toolbarView = new ControlsView();
                 App.toolbarView.render();
 
+                App.networkstatusView = new NetworkstatusView();
+                App.networkstatusView.render();
+
                 //            App.beginRouting();
                 App.registry.app_router= new Router.AppRouter();
                 App.registry.app_router.appManager=new AppManager();
+
+
                 Router.initialize(App.registry.app_router);
 
             });
