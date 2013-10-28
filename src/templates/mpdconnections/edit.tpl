@@ -22,6 +22,15 @@
         <label for="name">name</label>
         <input type="text"  name="name" id="name" value="<%= model.get('name') || 'coin' %>" />
     </div>
+
+    <h4>HTTP Stream</h4>
+    <div>
+        <label for="http_stream_active">http stream active ?</label>
+        <input type="checkbox"  name="http_stream_active" id="http_stream_active" />
+    </div><div>
+        <label for="http_stream_url">http stream url</label>
+        <input type="text"  name="http_stream_url" id="http_stream_url" value="<%= model.get('http_stream_url') %>" />
+    </div>
 </form>
 
 

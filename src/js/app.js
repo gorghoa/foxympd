@@ -36,6 +36,7 @@ define([
 
 ], function($,_,Backbone,MPD,AppManager,MPDConnectionCollection,SettingsCollection,SettingsModel,dbs) {
 
+try{
 
     var noMPDCONNECTION=false;
     var registry={
@@ -323,4 +324,7 @@ define([
         initializers:initializers
     };
 
+}catch(e) {
+    console.log(e.message);
+}
 });

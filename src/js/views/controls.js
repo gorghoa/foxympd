@@ -37,12 +37,15 @@ define([
             app.registry.mpd.on('player_changed',function(){
                     self.updateToolbar();
             });
+            app.registry.mpd.on('open',function(){
+                    self.render(app.registry.current_connection.get('http_stream_url'));
+                    self.updateToolbar();
+            });
         },
-        render: function() {
-
-            var data={};
+        render: function(http_stream_url) {
+            var http_stream_url = http_stream_url || null;
+            var data={http_stream_url:http_stream_url};
             this.$el.html(tpl(data));
-
         },
         events : {
             "click .control[role=mpd-control]":"mpd_action"
@@ -50,10 +53,9 @@ define([
 
         updateToolbar:function() {
             var self=this;
-
             var txt=(app.registry.mpd.statusdata.state==="play")?"pause":"playmedia";
-            $("button[role=mpd-control][data-action=playpause]").text(txt);
-
+            this.$el.find("button[role=mpd-control][data-action=playpause]").text(txt);
+            this.$el.find("button[role=mpd-control][data-action=stream]").attr('disabled',false);
             
         },
 
@@ -69,6 +71,19 @@ define([
 
                 case 'playpause':
                     mpd.togglePlayPause();
+                    break;
+
+                case 'stream':
+                    var audio =  this.$el.find('#http_stream_player')[0];
+                    console.log('ok',audio.paused);
+                    var t=$(e.target);
+                    if(audio.paused===false) {
+                        t.removeClass('active');
+                        audio.pause();
+                    } else {
+                        t.toggleClass('active',true);
+                        audio.play();
+                    }
                     break;
 
                 case 'next':
@@ -95,8 +110,6 @@ define([
         }
     });
 
-
     return controlsView;
-
 
 });

@@ -35,6 +35,7 @@ a[role="button"] {
 button:active,
 button.active,
 a[role="button"]:active,
+a[role="button"].active,
 button.recommend:active,
 a.recommend[role="button"]:active  {
   border-color: #008aaa;

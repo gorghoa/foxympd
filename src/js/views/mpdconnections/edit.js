@@ -87,7 +87,20 @@ define([
         },
         events:{
             "click a[role=button].delete":'destroy_connection',
-            "click button[role=connect]":'connect'
+            "click button[role=connect]":'connect',
+            "change #host":'update_url',
+            "change #http_stream_active":'active_url'
+        },
+        update_url:function(e) {
+            this.$el.find('#http_stream_url').val('http://'+$(e.target).val()+':8000/mpd.ogg');
+        },
+        active_url:function(e) {
+            var t = e.target;
+            if(t.checked) {
+                this.$el.find('#http_stream_url').attr('readonly','readonly');
+            } else {
+                this.$el.find('#http_stream_url').removeAttr('readonly','readonly');
+            }
         },
         'destroy_connection':function() {
             if(confirm('are you sure you want to delete connection?')) {
@@ -104,10 +117,13 @@ define([
         },
         'save':function() {
             console.log('saving');
-            this.model.set('name',$('input[name=name]').val());
-            this.model.set('host',$('input[name=host]').val());
-            this.model.set('port',$('input[name=port]').val());
-            this.model.set('password',$('input[name=password]').val());
+            this.model.set('name',this.$el.find('input[name=name]').val());
+            this.model.set('host',this.$el.find('input[name=host]').val());
+            this.model.set('port',this.$el.find('input[name=port]').val());
+            this.model.set('password',this.$el.find('input[name=password]').val());
+
+            var stream_url = this.$el.find('input[name=http_stream_url]').val() || null;
+            this.model.set('http_stream_url',stream_url);
             this.model.save();
             app.mpdconnect(this.model);
             $('[role=toolbar]').show();

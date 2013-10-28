@@ -47,23 +47,22 @@ define([
 
             registry.mpd.on('open',function() {
                                 self.mpdStatusConnected();
-                                registry.mpd.run();
-                                registry.app_ticker = setInterval(function() {
-                                    registry.event_manager.trigger('tick');
-                                },1000);
                     });
         },
         mpdStatusConnected:function() {
+            var mpdStatusEl = this.$el.children('.mpd'); 
             mpdStatusEl.text('connected').fadeOut(800);
         },
         mpdStatusShow:function() {
         },
         render: function() {
             this.$el.html(tpl());
-            this.updateMPDStatusButton();
 
             var networkStatusEl = this.$el.children('.network');
             networkStatusEl.text('no network connection');
+
+            this.updateMPDStatusButton();
+            this.updateOnlineStatus();
         },
 
         isMPDConnection: function() {
@@ -71,12 +70,16 @@ define([
         },
 
         events : {
-            '.mpd click':'redirect'
+            'click .mpd':'redirect'
         },
 
         redirect: function() {
+
             var noMPDCONNECTION = !this.isMPDConnection();
-            if(noMPDCONNECTION===true) app.registry.app_router.navigate('connections/add',{trigger:true});
+
+            if(noMPDCONNECTION===true) {
+                app.registry.app_router.navigate('connections/add',{trigger:true});
+            }
             else app.registry.mpd.connect(); 
         },
         updateMPDStatusButton:function() {
@@ -88,7 +91,6 @@ define([
 
             mpdStatusEl.text(errtext);
 
-            this.undelegateEvents();
             this.delegateEvents();
         },
         updateOnlineStatus : function (event) {
@@ -104,7 +106,6 @@ define([
         }
     });
     return view;
-
 
 });
 
