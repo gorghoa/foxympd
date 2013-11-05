@@ -42,7 +42,7 @@ define([
             this.delegateEvents();
 
             if(app.registry.settings.get('showCovers')===true) {
-                this.$el.find('img[role=cover]').attr('src','/imgs/defaultcover.jpg');
+                this.$el.find('img[role=cover]').attr('src','./imgs/defaultcover.jpg');
             }
         },
         songChanged:function(song) {

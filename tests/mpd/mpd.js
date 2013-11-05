@@ -21,6 +21,31 @@ define([
         });
 
         describe('processMPDData',function() {
+
+
+            it('should match errors',function() {
+                var mpd = new MPD();
+                var tanya = sinon.spy(mpd,'handleMPDError');
+                var data = 'ACK [5@0] {} unknown command "auie"\n';
+
+                var dfd = $.Deferred();
+                var r = {"data":data};
+                mpd.processMPDData(r,'',dfd,false); 
+                expect(tanya.calledOnce).to.equal(true);
+            });
+
+            it('should trigger mpd_error on errors',function() {
+                var mpd = new MPD();
+                var cb  = {onerror:function() {}};
+                var tanya = sinon.spy(cb,'onerror');
+                var data = 'ACK [5@0] {} unknown command "auie"\n';
+                var dfd = $.Deferred();
+                var r = {"data":data};
+
+                mpd.on('mpd_error',cb.onerror);
+                mpd.processMPDData(r,'',dfd,false); 
+                expect(tanya.calledOnce).to.equal(true);
+            });
     
 
                 

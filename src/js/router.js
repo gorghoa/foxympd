@@ -28,9 +28,10 @@ define([
     'views/menu',
     'views/mpddebug',
     'views/about',
-    'views/settings'
+    'views/settings',
+    'views/exception'
 
-],function($,_,Backbone, mpdconnectionsRouter,playlistsRouter,homeView,menuView,mpddebugView,aboutView,settingsView) {
+],function($,_,Backbone, mpdconnectionsRouter,playlistsRouter,homeView,menuView,mpddebugView,aboutView,settingsView,ExceptionView) {
 
 
     var AppRouter = Backbone.Router.extend({
@@ -39,7 +40,8 @@ define([
             "menu": "menu",
             "mpddebug": "mpddebug",
             "about": "about",
-            "settings":"settings"
+            "settings":"settings",
+            "exception":"exception"
         }
     });
 
@@ -66,6 +68,11 @@ define([
         });
         app_router.on("route:settings", function (path) {
 				  view = new settingsView();
+                  appManager.showView(view);
+        });
+
+        app_router.on("route:exception", function (path) {
+				  view = new ExceptionView();
                   appManager.showView(view);
         });
 

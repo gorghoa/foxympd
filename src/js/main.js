@@ -79,8 +79,9 @@ require([
     'views/header',
     'views/networkstatus',
     'router',
-    'appmanager'
-],function($,_,Backbone,App, ControlsView, HeaderView,NetworkstatusView,Router,AppManager) {
+    'appmanager',
+    'models/exception'
+],function($,_,Backbone,App, ControlsView, HeaderView,NetworkstatusView,Router,AppManager,ExceptionModel) {
 
 
 
@@ -104,6 +105,12 @@ require([
 
 
                 Router.initialize(App.registry.app_router);
+        
+                App.registry.mpd.on('mpd_error',function(data) {
+
+                        App.registry.last_exception = new ExceptionModel({'message':data,'raw_exception':'~~~~'});
+                        App.registry.app_router.navigate('exception',{trigger:true});
+                });
 
             });
 

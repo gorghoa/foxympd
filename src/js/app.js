@@ -149,9 +149,6 @@ try{
         initializers.initialize_mpd();
         initializers.initialize_event_manager();
 
-        registry.mpd.on('mpd_error',function(data) {
-            alert("mpd error:\n"+data+i);
-        });
 
         registry.mpd.on('close',function() {
                                         clearInterval(registry.app_ticker);
@@ -193,6 +190,10 @@ try{
 
         conn.done(function(model) {
                 registry.current_connection=model;
+        });
+
+        conn.fail(function(err) {
+            console.error(err);
         });
 
         setts.done(function() {
@@ -249,13 +250,11 @@ try{
         var promise = dfd.promise();
         var mpd=registry.mpd;
 
-
-
+        if(model) registry.current_connection=model;
 
         var doConnect = function (model,promise) {
-
                 if(!model) {
-                    dfd.reject();
+                    dfd.reject('no model given, impossible to connect mpd');
                     return promise;
                 }
 
@@ -287,8 +286,8 @@ try{
         if(typeof(model) === "object" ) return doConnect(model,promise);
         
 
-        if(typeof TCPSocket === 'undefined' && typeof mozTCPSocket === 'undefined') {
-            dfd.reject();
+        if(typeof navigator.TCPSocket === 'undefined' && typeof navigator.mozTCPSocket === 'undefined') {
+            dfd.reject('TCP Sockets are not available on your device. Sorry but you may not be able to use FoxyMPD :-\\');
             return promise;
         }
 
@@ -301,6 +300,7 @@ try{
                success:function(data)  {
 
                 model=data.last();
+
                 return doConnect(model,promise);
                }
             });

@@ -206,6 +206,10 @@
             self.run();
 
         },
+        handleMPDError:function(error) {
+            var self=this;
+            self.eventManager.trigger("mpd_error",error);
+        },
         processMPDData:function(response,buffer,dfd,parse) {
 
                 var self=this;
@@ -217,8 +221,7 @@
                  */
                 if(buffer.match(self.koRegExp)) {
 
-                    console.error("error mpd",buffer);
-                    self.eventManager.trigger("mpd_error",buffer);
+                    self.handleMPDError(buffer);
 
                     self.onDataEnd();
                     dfd.fail(buffer);
@@ -239,6 +242,10 @@
 
                 return buffer;
             },
+
+        isOpen:function() {
+            return (typeof this.socket !== "undefined" && this.socket.readyState==='open');
+        },
         run:function() {
 
             var self=this;

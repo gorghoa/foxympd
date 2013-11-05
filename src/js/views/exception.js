@@ -22,18 +22,28 @@ define([
     'backbone',
     'app',
 
+    'models/exception',
+
     'tpl!templates/error'
 
-],function($,_,Backbone,app,tpl) {
+],function($,_,Backbone,app,ExceptionModel,tpl) {
 
     var view = Backbone.View.extend({
 
+        initialize:function() {
+            if(!this.model && app.registry.last_exception != null) {
+                this.model=app.registry.last_exception;
+            } else {
+                this.model = new ExceptionModel({message:'generic exception',raw_exception:''});
+            }
+        },
+
         render: function() {
-            var done = $('<a href="#" role="button">home</a>');
-            app.headerView.setActionButtons([done]);
+
+            
+            console.log(this.model);
             this.$el.html(tpl({model:this.model}));
             app.headerView.setTitle('Error Occured');
-            console.error(this.model.get('raw_exception'));
         }
     });
 
@@ -42,5 +52,3 @@ define([
 
 
 });
-
-

@@ -8,7 +8,7 @@
 
 
     <% if (http_stream_url) { %>
-        <audio src="http://localhost:8000/mpd.ogg" id="http_stream_player"></audio>
+        <audio src="<%= http_stream_url %>" id="http_stream_player"></audio>
         <li><button class="control lsf" role="mpd-control" data-action="stream" disabled="disabled">music</button></li>
     <% } else { %>
 

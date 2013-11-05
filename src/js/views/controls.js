@@ -27,7 +27,7 @@ define([
 ],function($,_,Backbone,app,tpl) {
 
 
-
+try{
     var controlsView = Backbone.View.extend({
 
         el : 'div[role=toolbar]',
@@ -38,13 +38,18 @@ define([
                     self.updateToolbar();
             });
             app.registry.mpd.on('open',function(){
-                    self.render(app.registry.current_connection.get('http_stream_url'));
+                    try{
+                        self.render(app.registry.current_connection.get('http_stream_url'));
+                    } catch(e) {
+                        console.log(e.message,e.fileName,e.lineNumber);
+                    }
                     self.updateToolbar();
             });
         },
         render: function(http_stream_url) {
             var http_stream_url = http_stream_url || null;
             var data={http_stream_url:http_stream_url};
+
             this.$el.html(tpl(data));
         },
         events : {
@@ -112,4 +117,7 @@ define([
 
     return controlsView;
 
+} catch(e) {
+    console.log(e.message);
+}
 });
