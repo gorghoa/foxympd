@@ -107,6 +107,17 @@ try{
                     mpd.getStatus();
                     break;
 
+                case 'goto':
+                    app.registry.mpd.currentsong().done(function(result) {
+                        song = result.data;
+                        var els = document.getElementsByName(song.Id);
+                        if(els.length) {
+                            var top = $(els[0]).offset().top - 40;
+                            $('html,body').animate({scrollTop:top},100);
+                        }
+                    });
+                    break;
+
                 default:
                     break;
             }

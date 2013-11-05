@@ -22,5 +22,6 @@
     <li><button class="control lsf" role="mpd-control" data-action="previous" >back</button></li>
     <li><button class="control lsf" role="mpd-control" data-action="playpause" >pause</button></li>
     <li><button class="control lsf" role="mpd-control" data-action="next" >next</button></li>
+    <li><button class="control lsf" role="mpd-control" data-action="goto" >pin</button></li>
 </ul>
 

@@ -71,7 +71,12 @@ define([
 
                 return ret;
 
-            }
+            },
+            comparator: function(mdl1,mdl2) {
+                    var first = parseInt(mdl1.get('Id'),10);
+                    var second = parseInt(mdl2.get('Id'),10);
+                    return ( (first > second && first) || !second)?1:-1;
+            },
     });
 
     return PlaylistCollection;

@@ -5,7 +5,6 @@
 [role=toolbar] {
   background:-moz-linear-gradient(top,#123,#000);
   opacity:0.8;
-
 }
 
 [role="toolbar"] ul {
@@ -13,15 +12,17 @@
   padding: 0;
   margin: 0;
   text-align:center;
+  width:100%;
 }
 
 
 [role="toolbar"] li {
     display:inline-block;
+    width:18%;
 }
 
 [role="toolbar"] button {
-  width: 4rem;
+  width: 100%;
   border: none;
   background: transparent no-repeat 50% 50%;
   padding: 0;
