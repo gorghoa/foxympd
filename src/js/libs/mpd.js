@@ -24,6 +24,7 @@
 ],function($,_,Backbone) {
 
 
+    "use strict";
 
     var TCPSocket = navigator.mozTCPSocket;
 
@@ -283,7 +284,11 @@
             var buffer="";
 
             self.socket.ondata=function(response) {
-                buffer = self.processMPDData(response,buffer,dfd,parse);
+                try{
+                    buffer = self.processMPDData(response,buffer,dfd,parse);
+                } catch(e) {
+                    console.log('ondata',e.message);
+                }
             };
 
             self.socket.send(actionString);
@@ -293,12 +298,11 @@
 
         send:function(actionString,options) {
 
-            var dfd = $.Deferred();
-
-
             options = options || {};
+            var dfd = (options.dfd && typeof options.dfd !== 'undefined') ? options.dfd : $.Deferred();
 
-            options.dfd = options.dfd || dfd;
+            options.dfd = dfd;
+
 
             options.parse = (options.parse!==undefined)? options.parse : true;
 
@@ -563,27 +567,30 @@
 
             var self=this;
 
-            re = new RegExp("^(file): (.*)$");
+            var re = new RegExp("^(file): (.*)$");
 
 
             var dfd = $.Deferred();
             var songs="";
 
-            var allArtists = function(artist,options) {
-                options = options || {parse:false};
-                var p = self.send('find Artist "'+artist+'"\n',options);
+            var allArtists = function(artist) {
+                var p = $.Deferred();
+                var options = {parse:false,dfd:p};
+                self.send('find Artist "'+artist+'"\n',options);
                 p.done(function(result) {
                     songs=songs+result.data;
                 });
                 return p;
             };
 
+
             var artistsDef = artists.map(allArtists);
 
-            $.when.apply($,artistsDef).done(function() {
+            var result = $.when.apply($,artistsDef);
             
+            result.done(function() {
                 var cmd_list="command_list_begin\n";
-                data=self.splitMPDData(songs);
+                var data=self.splitMPDData(songs);
 
                 _.each(data,function(item) {
                     done = item.match(re);
@@ -594,6 +601,7 @@
                 cmd_list+="command_list_end\n";
 
                 self.send(cmd_list).done(dfd.resolve());
+
             });
 
             return dfd.promise();
@@ -603,8 +611,7 @@
 
             var self=this;
 
-            re = new RegExp("^(file): (.*)$");
-
+            var re = new RegExp("^(file): (.*)$");
 
             var dfd = $.Deferred();
             var songs="";
@@ -622,7 +629,7 @@
             $.when.apply($,albumsDef).done(function() {
             
                 var cmd_list="command_list_begin\n";
-                data=self.splitMPDData(songs);
+                var data=self.splitMPDData(songs);
 
                 _.each(data,function(item) {
                     done = item.match(re);
@@ -639,17 +646,21 @@
         },
 
 
-        addSongs:function(songs,options) {
+        addSongs:function(songs) {
                 var cmd_list="command_list_begin\n";
                 var self=this;
-                data=songs;
+                var data=songs;
+
+                var dfd = $.Deferred();
 
                 _.each(data,function(item) {
                     cmd_list+='add "'+item+'"\n';
                 });
                 cmd_list+="command_list_end\n";
 
-                self.send(cmd_list,options).done(dfd.resolve());
+                self.send(cmd_list,{dfd:dfd});
+
+                return dfd;
         },
 
 

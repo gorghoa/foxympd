@@ -34,11 +34,11 @@ define([
     var view = Backbone.View.extend({
 
         toggle:function() {
-            this.$el.find('*').slideToggle(100);
+            this.$el.toggle();
         },
         render: function() {
             this.$el.html(tpl());
-            this.$el.find('*').slideToggle(1);
+            this.$el.toggle();
             this.delegateEvents();
 
             if(app.registry.settings.get('showCovers')===true) {

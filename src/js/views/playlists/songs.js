@@ -51,10 +51,16 @@ define([
             roledata.empty();
 
             var divArtist=$('<div class="artist"/>');
+
+            el.append(divArtist);
             _.each(data,function(item) {
                 i++;
 
                 view = new detailedView({model:item}); 
+                view.render();
+                /*
+
+                try{
 
                 if(item.get('Title')) {
                     first = item.get('Artist');
@@ -70,7 +76,12 @@ define([
                     divArtist.append(tplRoledata({last:last}));
                 }
 
-                divArtist.append(view.render());
+                } catch(e) {
+                    console.log(e.message,'aurisetaunrsetaunriestaunrsetanuriestaunrisetanuriset');
+                }
+                */
+
+                divArtist.append(view.el);
 
 
              }); 
@@ -85,22 +96,13 @@ define([
 
 
             self.$el.html(tpl({size:'~'}));
-            /*
-            var coll = this.collection;
-            app.registry.mpd.stats().then(function(result) {
-
-                self.$el.html(tpl({size:'~'}));
-                
-            });
-            */
-
             return self.$el;
 
         },
 
         filtering:function(val, e) {
 
-            if(val.length<4) return;
+            if(val.length<3) return;
             console.log('filtering songs');
             var self=this;
 
@@ -108,11 +110,10 @@ define([
 
             c.search(val,{
                 success:function(data) {
-
-                     
                     self.renderdata(data.models);
                 }
             });
+
 
         },
         events: {
@@ -121,28 +122,23 @@ define([
         selectArtist:function(e) {
             var target=$(e.currentTarget).parent();
             $(target).children('li[role=artist]').toggleClass('selected');
-
         },
         'done':function(e) {
 
             var self=this;
-            var checked=this.$el.find('.selected');
+            var checked=self.el.getElementsByClassName('selected');
             var mpd=app.registry.mpd;
 
+
             var selection = _.map(checked,function(item) {
-                var id = $(item).attr('data-id');
-                var model =  self.collection.get(id);
-                return model.get('file');
+                return $(item).attr('data-file');
             });
 
             mpd.addSongs(selection).done(function() {
-                checked.removeClass('selected');
-            
+                $(checked).removeClass('selected');
             });
         }
     });
 
     return view;
 });
-
-

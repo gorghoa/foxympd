@@ -30,16 +30,15 @@ define([
 
     var view = Backbone.View.extend({
 
+        el : '<li role="artist" class="list" >anuriset</li>',
         initialize:function() {
-           this.el = $('<li role="artist" class="list" >');
-           this.$el = $(this.el);
            this.$el.attr('data-id',this.model.cid);
+           this.$el.attr('data-file',this.model.get('file'));
         },
 
         
         render:function() {
            this.$el.html(tplData({item:this.model}));
-           return this.$el;
         },
 
         events : {

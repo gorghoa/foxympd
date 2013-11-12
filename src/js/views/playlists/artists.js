@@ -123,7 +123,6 @@ define([
 
             mpd.addArtists(songs).done(function() {
                 checked.removeClass('selected');
-            
             });
         }
     });
