@@ -36,7 +36,13 @@ define([
 
         },
         events:{
-            "submit form":'send'
+            "submit form":'send',
+            "click .hints span":'hint'
+        },
+        hint:function(e) {
+            e.preventDefault();
+            var el = e.currentTarget.textContent;
+            this.$el.find('input[name=request]').val(el);
         },
         'send':function(e) {
 

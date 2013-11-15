@@ -25,13 +25,12 @@ define([
 
     'timetools',
 
-    'tpl!templates/header',
+    'tpl!templates/header'
 
-    'views/header_extended'
-
-],function($,_,Backbone,app,timetools,tpl,headerExtendedView) {
+],function($,_,Backbone,app,timetools,tpl) {
 
 
+    "use strict";
 
     var networkAPI = navigator.connection || navigator.mozConnection;
 
@@ -41,8 +40,6 @@ define([
         tick:null,
         elapsed:0,
         initialize:function() {
-
-            this.headerExtendedView=new headerExtendedView();
 
             var self=this;
             app.registry.mpd.on('player_changed',function(){
@@ -56,10 +53,15 @@ define([
                     self.updateStatus(false);
             });
 
-
             app.registry.event_manager.on('tick',function(){
                 self.updateElapsedTime();
             });
+        },
+        events:{
+            'click .titles':'toggleExtended'
+        },
+        toggleExtended:function() {
+            app.headerExtendedView.toggle();
         },
         render: function() {
 
@@ -70,12 +72,6 @@ define([
             this.$el.html(re);
             this.updateTitles();
 
-            this.headerExtendedView.$el = this.$el.find('#cover_container');
-            this.headerExtendedView.render();
-
-            this.$el.find('.titles').click(function() {
-                self.headerExtendedView.toggle();
-            });
 
         },
         updateStatus:function(force) {
@@ -86,14 +82,11 @@ define([
         },
         updateTitles:function() {
             var self=this;
-
             var song;
 
-            app.registry.mpd.currentsong().done(function(result) {
+            app.get_last_song().done(function(result){
                 song = result.data;
                 self.setTitle(song.Title);
-
-                self.headerExtendedView.songChanged(song);
             });
 
             app.registry.mpd.status().done(function(result) {

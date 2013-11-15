@@ -117,6 +117,7 @@
             return this.connectingpromise;
         },
         connect:function(connect_infos) {
+
             var dfd = $.Deferred();
 
             this.connectingpromise=dfd.promise();
@@ -287,7 +288,7 @@
                 try{
                     buffer = self.processMPDData(response,buffer,dfd,parse);
                 } catch(e) {
-                    console.log('ondata',e.message);
+                    console.error('ondata',response,e.message, actionString);
                 }
             };
 

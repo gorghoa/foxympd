@@ -39,7 +39,9 @@ try{
             });
             app.registry.mpd.on('open',function(){
                     try{
-                        self.render(app.registry.current_connection.get('http_stream_url'));
+
+                        var stream_url = (app.registry.current_connection.get('http_stream_active') && app.registry.current_connection.get('http_stream_url'))?app.registry.current_connection.get('http_stream_url'):null;
+                        self.render();
                     } catch(e) {
                         console.log(e.message,e.fileName,e.lineNumber);
                     }
@@ -108,14 +110,7 @@ try{
                     break;
 
                 case 'goto':
-                    app.registry.mpd.currentsong().done(function(result) {
-                        song = result.data;
-                        var els = document.getElementsByName(song.Id);
-                        if(els.length) {
-                            var top = $(els[0]).offset().top - 40;
-                            $('html,body').animate({scrollTop:top},100);
-                        }
-                    });
+                    app.registry.event_manager.trigger('goto_song');
                     break;
 
                 default:

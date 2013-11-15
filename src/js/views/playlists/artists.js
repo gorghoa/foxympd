@@ -32,6 +32,7 @@ define([
 
 ],function($,_,Backbone,app,ArtistCollection,tplArtist,tplRoledata,detailedArtistView) {
 
+    "use strict";
 
     var view = Backbone.View.extend({
 
@@ -46,6 +47,12 @@ define([
 
         renderdata:function(items) {
 
+
+            items = _.sortBy(items,function(mdl1) {
+                return mdl1.get('Artist').toUpperCase();
+            });
+                
+
             var last=null,first,init,keys=[],view,percent=0,i=0,size=_.size(items),inter;
             var el = $('<ul/>');
 
@@ -57,7 +64,7 @@ define([
 
                     view = new detailedArtistView({model:item}); 
 
-                    first = item.get('Artist')[0];
+                    first = (_.size(item.get('Artist')))?item.get('Artist')[0].toUpperCase():'Mistagged Artists… <span class="lsf">wink</span>';
 
                     if( first != last) {
 

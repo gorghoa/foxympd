@@ -121,7 +121,7 @@ define([
             this.model.set('host',this.$el.find('input[name=host]').val());
             this.model.set('port',this.$el.find('input[name=port]').val());
             this.model.set('password',this.$el.find('input[name=password]').val());
-
+            this.model.set('http_stream_active',this.$el.find('input[name=http_stream_active]').prop('checked'));
             var stream_url = this.$el.find('input[name=http_stream_url]').val() || null;
             this.model.set('http_stream_url',stream_url);
             this.model.save();

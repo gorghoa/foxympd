@@ -25,7 +25,7 @@
 
     <h4>HTTP Stream</h4>
     <div>
-        <label for="http_stream_active">http stream active ?</label>
+        <label checked="<%= (model.get('http_stream_active'))?'checked':'' %>" for="http_stream_active">http stream active ?</label>
         <input type="checkbox"  name="http_stream_active" id="http_stream_active" />
     </div><div>
         <label for="http_stream_url">http stream url</label>

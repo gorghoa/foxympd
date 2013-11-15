@@ -51,6 +51,12 @@ try{
     var toolbarView={};
     var headerView={};
 
+    var lastSong=null;
+
+    get_last_song = function() {
+        if(lastSong===null) return registry.mpd.currentsong();
+        return lastSong;
+    };
 
     var initializers={
 
@@ -62,6 +68,10 @@ try{
 
         initialize_mpd:function() {
             registry.mpd=new MPD();
+
+            registry.mpd.on('player_changed',function() {
+                    lastSong = registry.mpd.currentsong();
+            });
         },
 
         initSettings : function() {
@@ -125,9 +135,11 @@ try{
                     lock = window.navigator.requestWakeLock('screen');
                 }
 
-                if(!registry.mpd.connect_infos.length) break;
+
+                if(!_.size(registry.mpd.connect_infos)) break;
 
                 prom=registry.mpd.connect();
+
 
                 prom.fail(function(e) {
                     console.warn("visible error: ",e);
@@ -321,7 +333,8 @@ try{
         toolbarView:toolbarView,
         /*beginRouting:beginRouting,*/
         mpdconnect:mpdconnect,
-        initializers:initializers
+        initializers:initializers,
+        get_last_song:get_last_song
     };
 
 }catch(e) {

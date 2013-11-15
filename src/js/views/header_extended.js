@@ -29,16 +29,47 @@ define([
 ],function($,_,Backbone,app,cover,tpl) {
 
 
+    "use strict";
 
 
     var view = Backbone.View.extend({
 
-        toggle:function() {
-            this.$el.toggle();
+        initialize:function() {
+            var self= this;
+            app.registry.app_manager.eventManager.on('show_view',function() {
+                self.hide();
+            });
+            app.registry.event_manager.on('goto_song',function() {
+                self.hide();
+            });
+
+            app.registry.mpd.on('player_changed',function(){
+                app.get_last_song().done(function(result){
+                        var song = result.data;
+                        self.songChanged(song);
+                });
+            });
+
+            var self=this;
+            app.get_last_song().done(function(result){
+                    var song = result.data;
+                    self.songChanged(song);
+            });
+        },
+        el:'#cover_container',
+        hide:function() {
+            console.log('hide');
+            this.$el.toggleClass('discreet',true);
+        },
+        show:function() {
+            this.$el.removeClass('discreet');
+        },
+        toggle:function(force) {
+            this.$el.toggleClass('discreet',force);
         },
         render: function() {
             this.$el.html(tpl());
-            this.$el.toggle();
+            this.hide();
             this.delegateEvents();
 
             if(app.registry.settings.get('showCovers')===true) {
@@ -46,6 +77,8 @@ define([
             }
         },
         songChanged:function(song) {
+            
+            console.log('songChanged',song.Artist);
 
             this.$el.find('[role=artist]').text(song.Artist);
             this.$el.find('[role=album]').text(song.Album);

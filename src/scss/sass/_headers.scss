@@ -1,10 +1,10 @@
 header {
     font-size:1rem;
-    background-image:linear-gradient(top,#000,rgba(255,255,255,0), transparent 2rem);
+    background:$bg;
 
 }
 section[role=region] header {
-    background:-moz-linear-gradient(top,#000,#123);
+    background:$bg;
 }
 
 section[role=region] header menu[type="toolbar"] {
@@ -43,7 +43,6 @@ section[role="region"] header a.home.ondata
 
 
 section[role=region] header .titles {
-    text-shadow: #123 1px 1px;
     font-weight:bold;
     margin-right:1.8em;
 }
@@ -55,30 +54,39 @@ section[role=region] header .titles h1 {
     font-size:0.8em;
 }
 
-#cover_container img {
+.cover_container img {
     max-height:7em;
     margin:1em;
     border:0.2em #FFF solid;
 }
 
-#cover_container {
-    position:fixed !important;
+.cover_container {
+    position:fixed;// !important;
     font-weight:bold;
     color:#FFF;
-    position:absolute;
+    //position:absolute;
     bottom:3.8em;
     left:0;
     right:0;
-    background:-moz-linear-gradient(top,#123, #000 5%, #000 95%, rgba(17,34,51,0.8));
+    background:$bg;
     top:1.7rem;
     padding-top:1em;
-    z-index:-2;
     text-align:center;
+    z-index:3;
 }
 
-button.discreet {
+.discreet
+{
+    right:10000px;
+}
+.discreet *
+{
+    display:none;
+}
+
+#cover_container button{
     margin-top:1em;
-    color:transparent;
-    text-shadow: 1px 1px  1px #123,1px 1px 2px #FFF, -1px -1px 2px #FFF,0 0 10px #FFF;;
-    opacity:0.5;
+    color:#FFF;
+    text-shadow:none;
+    background:transparent;
 }

@@ -26,6 +26,7 @@ define([
     'backbone.mpd'
 ],function($,_,Backbone,SongModel,BackboneMpd) {
 
+    "use strict";
 
     var PlaylistCollection = BackboneMpd.Collection.extend({
 
@@ -67,11 +68,9 @@ define([
             parse_mpd_response:function(data) {
 
 
-
                 var re = new RegExp("\n");
-
-
                 data = data.split(re);
+
 
                 re = new RegExp("(^$)|(^OK)");
                 data = _.reject(data,function(item) {
@@ -82,22 +81,23 @@ define([
                 var done;
 
                 var ret=[];
-                var model=new SongModel;
+                var model;
                 _.each(data,function(item) {
 
                     done = item.match(re);
                     
                     if(done) {
-                        model.set(done[1],done[2]);
 
                         if(done[1]==='file') {
+                            model=new SongModel();
                             ret[ret.length]=model;
-                            model=new SongModel;
                         }
+                        model.set(done[1],done[2]);
                     } else {
                         console.log('tiens… tiens…',item);
                     }
                 });
+
 
                 return ret;
 

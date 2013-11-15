@@ -6,9 +6,10 @@
 <% datum.each(function(item) { %>
 
     <li role="song"  class="list" data-id="<%= item.get('Id') %>">
-    <a name="<%= item.get('Id') %>"></a>
+     <a name="<%= item.get('Id') %>"></a>
     <div class="title">
     <%= item.get('Title') %></div>
+    <img class="artist" />
         <div class="artist"><%= item.get('Artist') %>
      ~            <% if(item.get('Time')) { %><%= timetools.time_to_duration(item.get('Time')) %> <% } %></td>
         

@@ -33,7 +33,6 @@ define([
         el : 'section[role=network-status]',
         initialize:function() {
 
-
             var self=this;
             var registry = app.registry;
 

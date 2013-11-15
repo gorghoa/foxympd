@@ -29,6 +29,7 @@ define([
 
 
     
+    var urls ={};
     /**
      * getCover 
      * 
@@ -40,6 +41,12 @@ define([
     var getCover = function (artist, album){
 
             var dfd=$.Deferred();
+
+
+            if (urls[artist]) {
+                dfd.resolve(urls[artist]);
+                return dfd;
+            }
 
                 $.getJSON("http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&api_key=29c5250b1bfc79c52af1357e42351948&artist=" + encodeURIComponent(artist) + "&format=json", function(data) {
 
@@ -53,7 +60,7 @@ define([
                 });
 
                 if (cover_url) {
-
+                    urls[artist] = cover_url;
                     dfd.resolve(cover_url);
                 } else {
                     dfd.reject();

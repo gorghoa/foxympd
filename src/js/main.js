@@ -77,11 +77,14 @@ require([
     'app',
     'views/controls',
     'views/header',
+    'views/header_extended',
     'views/networkstatus',
     'router',
     'appmanager',
     'models/exception'
-],function($,_,Backbone,App, ControlsView, HeaderView,NetworkstatusView,Router,AppManager,ExceptionModel) {
+],function($,_,Backbone,App, ControlsView, HeaderView,HeaderExtendedView,NetworkstatusView,Router,AppManager,ExceptionModel) {
+
+            "use strict";
 
 
 
@@ -89,6 +92,10 @@ require([
 
 
             promise.always(function() {
+                App.registry.app_manager = new AppManager();
+
+                App.headerExtendedView = new HeaderExtendedView();
+                App.headerExtendedView.render();
 
                 App.headerView = new  HeaderView();
                 App.headerView.render();
@@ -96,18 +103,18 @@ require([
                 App.toolbarView = new ControlsView();
                 App.toolbarView.render();
 
+
                 App.networkstatusView = new NetworkstatusView();
                 App.networkstatusView.render();
 
                 //            App.beginRouting();
                 App.registry.app_router= new Router.AppRouter();
-                App.registry.app_router.appManager=new AppManager();
+                App.registry.app_router.appManager= App.registry.app_manager;
 
 
                 Router.initialize(App.registry.app_router);
         
                 App.registry.mpd.on('mpd_error',function(data) {
-
                         App.registry.last_exception = new ExceptionModel({'message':data,'raw_exception':'~~~~'});
                         App.registry.app_router.navigate('exception',{trigger:true});
                 });

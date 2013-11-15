@@ -46,6 +46,10 @@ define([
 
         renderdata:function(items) {
 
+            items = _.sortBy(items,function(mdl1) {
+                return mdl1.get('Album').toUpperCase();
+            });
+
             var last=null,first,init,keys=[],view,percent=0,i=0,size=_.size(items),inter;
             var el = $('<ul/>');
 
@@ -59,7 +63,7 @@ define([
 
                 view = new detailedAlbumView({model:item}); 
 
-                first = item.get('Album')[0];
+                first = (_.size(item.get('Album')))?item.get('Album')[0].toUpperCase():'Mistagged Albums… <span class="lsf">wink</span>';
 
                 if( first != last) {
 

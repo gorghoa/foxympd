@@ -29,9 +29,10 @@ define([
     'views/playlists/storedplaylists',
 
     'tpl!templates/playlist/list',
-    'tpl!templates/mpdfetching'
+    'tpl!templates/mpdfetching',
+    'libs/cover'
 
-],function($,_,Backbone, timetools, app, PlaylistCollection, StoredPlaylistView, tpl,mpdfetchingTpl) {
+],function($,_,Backbone, timetools, app, PlaylistCollection, StoredPlaylistView, tpl,mpdfetchingTpl,cover) {
 
 
 
@@ -42,7 +43,13 @@ define([
         initialize: function() {
             var self=this;
             app.registry.mpd.on('playlist_changed',function() {self.render();});
-            app.registry.mpd.on('player_changed',function() {self.updateHeader();});
+            app.registry.mpd.on('player_changed',function() {
+                self.updateHeader();
+                self.goto();
+            });
+            app.registry.event_manager.on('goto_song',function() {
+                self.goto(); 
+            });
 
             this.playlist = new PlaylistCollection({
                 mpdconnection: app.registry.mpd
@@ -90,6 +97,7 @@ define([
                         }
 
                         self.updateHeader();
+                        self.goto(); 
                     }
                 }
             });
@@ -107,13 +115,32 @@ define([
 
             $('.current').removeClass('current');
 
-            app.registry.mpd.currentsong().done(function(result) {
+            app.get_last_song().done(function(result){
                 song = result.data;
                 var el = $("[data-id="+song.Id+"]");
+
+
+
+                if(app.registry.settings.get('showCovers')===true) {
+                    var img = el.find('img.artist');
+                    cover(song.Artist,song.Album).done(function(cover_url) {
+                        img.attr('src',cover_url);
+                    });
+                }
                 if(el.size()) {
                     el.toggleClass('current',true);
                 }
             });
+        },
+        goto:function() {
+                app.get_last_song().done(function(result){
+                    song = result.data;
+                    var els = document.getElementsByName(song.Id);
+                    if(els.length) {
+                        var top = $(els[0]).offset().top - 40;
+                        $('html,body').animate({scrollTop:top},100);
+                    }
+                });
         },
         play:function(e) {
             e.preventDefault();

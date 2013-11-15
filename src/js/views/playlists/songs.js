@@ -1,5 +1,4 @@
-/*
-    © barosofts, César & Rodrigue Villetard, 2013
+/* © barosofts, César & Rodrigue Villetard, 2013
 
     This file is part of FoxyMPD.
 
@@ -42,6 +41,10 @@ define([
 
         renderdata:function(data) {
 
+            data = _.sortBy(data,function(mdl1) {
+                return (mdl1.get('Artist'))?mdl1.get('Artist').toUpperCase():'';
+            });
+
             var last=null,first,init,keys=[],view,percent=0,i=0,size=_.size(data),inter;
             el = $('<div/>');
 
@@ -49,42 +52,30 @@ define([
 
             var roledata=this.$el.children('[role=data]');
             roledata.empty();
+            var el = $('<ul/>');
 
-            var divArtist=$('<div class="artist"/>');
-
-            el.append(divArtist);
+            var i=0;
             _.each(data,function(item) {
-                i++;
+
 
                 view = new detailedView({model:item}); 
-                view.render();
-                /*
 
-                try{
-
-                if(item.get('Title')) {
-                    first = item.get('Artist');
-                } else {
-                    first = "_";
-                }
+                first = (_.size(item.get('Artist')))?item.get('Artist'):'Mistagged Artists… <span class="lsf">wink</span>';
 
                 if( first != last) {
+
+                    roledata.append(el);
+                    el=$('<ul/>');
                     keys[keys.length]=first;
                     last = first;
-                    el.append(divArtist);
-                    divArtist=$('<div class="artist" />');
-                    divArtist.append(tplRoledata({last:last}));
+                    roledata.append(tplRoledata({last:last}));
                 }
-
-                } catch(e) {
-                    console.log(e.message,'aurisetaunrsetaunriestaunrsetanuriestaunrisetanuriset');
-                }
-                */
-
-                divArtist.append(view.el);
+                view.render();
+                el.append(view.$el);
 
 
              }); 
+
 
 
             roledata.append(el);

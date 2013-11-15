@@ -24,7 +24,8 @@ define([
 
 
     var appManager = function() {
-
+       this.eventManager={};
+        _.extend(this.eventManager,Backbone.Events);
     };
 
     var done = $('<a href="#menu" id="settings"><span class="lsf lsf-symbol">param</span></a>');
@@ -35,7 +36,7 @@ define([
         currentView:null,
         showView : function(view) {
 
-            $('#cover_container *').slideUp(50);
+            this.eventManager.trigger('show_view');
 
             if (this.currentView) {
 
@@ -50,7 +51,7 @@ define([
             $('#menu_buttons').empty();
             $('#menu_buttons').html(done);
 
-	    window.scrollTo(0,0);
+            window.scrollTo(0,0);
             this.currentView.render();
             $('section[role=main]').html(this.currentView.el);
         }
