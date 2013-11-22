@@ -42,6 +42,7 @@ define([
             },
             parse_mpd_response:function(data) {
 
+
                 var re = new RegExp("\n");
                 data = data.split(re);
 

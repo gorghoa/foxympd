@@ -32,7 +32,7 @@ define([
         render: function() {
             var self=this;
 
-            var data={isRepeat:app.registry.mpd.isRepeat(),isRandom:app.registry.mpd.isRandom()};
+            var data={isRepeat:app.registry.mpd.isRepeat()};
             this.$el.html(tpl(data));
 
             this.$el.find('button').click(function(e) { self.mpd_action(e);});
@@ -67,8 +67,8 @@ define([
                     mpd.volumeUp();
                     break;
 
-                case "randomize":
-                    promise = mpd.toggleRandom();
+                case "shuffle":
+                    mpd.shuffle();
                     break;
 
                 default:

@@ -26,6 +26,8 @@ define([
 
 ],function($,_,Backbone,app,tpl) {
 
+"use strict";
+
 
 try{
     var controlsView = Backbone.View.extend({
@@ -50,7 +52,7 @@ try{
         },
         render: function(http_stream_url) {
             var http_stream_url = http_stream_url || null;
-            var data={http_stream_url:http_stream_url};
+            var data={http_stream_url:http_stream_url,isRandom:app.registry.mpd.isRandom()};
 
             this.$el.html(tpl(data));
         },
@@ -68,12 +70,14 @@ try{
 
         mpd_action:function(e) {
             var action = e.target.getAttribute('data-action');
+            var target = $(e.currentTarget);
             var mpd=app.registry.mpd;
 
+            var promise;
             switch (action) {
 
-                case "shuffle":
-                    mpd.shuffle();
+                case "randomize":
+                    promise = mpd.toggleRandom();
                     break;
 
                 case 'playpause':
@@ -115,6 +119,13 @@ try{
 
                 default:
                     break;
+
+            }
+
+            if(promise) {
+                promise.done(function(result) {
+                    target.toggleClass('active');
+                });
             }
             
 

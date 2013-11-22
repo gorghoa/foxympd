@@ -355,7 +355,7 @@
         },
         pause:function(value) {
             value=(value)?1:0;
-            msg ='pause '+value+'\n';
+            var msg ='pause '+value+'\n';
             var self=this;
             return this.send(msg).then(function(result) {
                 return (value===1)?false:true;
@@ -453,7 +453,7 @@
 
         playlistExists:function(val) {
 
-            var dfd=$.Deferred();
+            var dfd=$.Deferred(), match;
             this.send('listplaylists\n',{parse:false}).then(function(result) {
             var re=new RegExp('^(.*): '+val+"$");
 
