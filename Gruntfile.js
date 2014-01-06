@@ -1,5 +1,6 @@
 module.exports = function(grunt) {
 
+//test svn
 
     var project_js_files = ['./src/js/**/*.js','!./src/js/libs/**/*.js','./src/js/libs/*.js','./src/js/libs/backbone/backbone.mpd.js','!./src/js/foxympd.js','./src/templates/**/*.tpl','./tests/**/*.js','!./tests/vendor/**/*.js'];
 
