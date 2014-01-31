@@ -23,13 +23,13 @@ Build and zip, ready for publication
 
 
 Test the app
-============
+------------
 
 Install ffOS simulator, download the latest realeased archive, extract it, add the webapp.manifest to your simulator.
 
 
 Build the app
-=============
+-------------
 
 run grunt build, then upload the \_build dir to your FirefoxOS device.
 
@@ -40,9 +40,9 @@ Install in dev
 Prerequisites : 
 ---------------
 
-#. FirefoxOS Simulator, node.js and npm must be available
+  FirefoxOS Simulator, node.js and npm must be available
 
-install grunt :
+Install grunt :
 
     $ sudo npm install -g grunt-cli
 
@@ -56,27 +56,30 @@ Release notes
 =============
 
 1.0.1
+-----
 
-#. Fix the http stream flux
-#. Move the shuffle playlist button to menu, and ask for confirmation before shuffle it ;)
-#. Move the play random to the bottom toolbar
-#. Move the http stream activator to the extended play pannel
+* Fix the http stream flux
+* Move the shuffle playlist button to menu, and ask for confirmation before shuffle it ;)
+* Move the play random to the bottom toolbar
+* Move the http stream activator to the extended play pannel
 
 1.0.0
+-----
 
-#. First acceptable release
+*. First acceptable release
 
 0.0.4
+-----
 
-#. cover support (settingable)
-#. add settings screen
-#. add setting from screen locking
+*. cover support (settingable)
+*. add settings screen
+*. add setting from screen locking
 
 0.0.3
 -----
 
-#. prevent screen from beeing locked
-#. add mpd connection error button
+*. prevent screen from beeing locked
+*. add mpd connection error button
 
 
 
