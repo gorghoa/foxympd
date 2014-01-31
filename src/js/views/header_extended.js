@@ -34,6 +34,7 @@ define([
 
     var view = Backbone.View.extend({
 
+        stream_url:null,
         initialize:function() {
             var self= this;
             app.registry.app_manager.eventManager.on('show_view',function() {
@@ -45,7 +46,8 @@ define([
 
             app.registry.mpd.on('open',function(){
                     try{
-                        var stream_url = (app.registry.current_connection.get('http_stream_active') && app.registry.current_connection.get('http_stream_url'))?app.registry.current_connection.get('http_stream_url'):null;
+                        self.stream_url = (app.registry.current_connection.get('http_stream_active') && app.registry.current_connection.get('http_stream_url'))?app.registry.current_connection.get('http_stream_url'):null;
+
                         self.render();
                     } catch(e) {
                         console.log(e.message,e.fileName,e.lineNumber);
@@ -77,7 +79,7 @@ define([
             this.$el.toggleClass('discreet',force);
         },
         render: function() {
-            this.$el.html(tpl({http_stream_url:true}));
+            this.$el.html(tpl({http_stream_url:this.stream_url}));
             this.hide();
             this.delegateEvents();
 
