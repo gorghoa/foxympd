@@ -697,7 +697,8 @@
 
         /* current playlist */
         isRandom:function() {
-            return  (this.statusdata.random==="1")?true:false;
+            console.info('rand',this.statusdata,(parseInt(this.statusdata.random,10)===1)?true:false);
+            return  (parseInt(this.statusdata.random,10)===1)?true:false;
         },
         toggleRandom:function(options) {
             var msg = (this.isRandom())?0:1;

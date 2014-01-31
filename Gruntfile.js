@@ -33,7 +33,8 @@ module.exports = function(grunt) {
             httpFontsPath : "/foxy/fonts",
             imagesDir : "src/imgs",
             javascriptsDir : "src/js",
-            environment:"development"
+            environment:"development",
+            debugInfo:true
           }
         }
     },

@@ -68,7 +68,10 @@ define([
                     break;
 
                 case "shuffle":
-                    mpd.shuffle();
+                    
+                    if(confirm('This will shuffle the mpd playlist, not just play random, sure that’s what you want?')) {
+                            mpd.shuffle();
+                    }
                     break;
 
                 default:

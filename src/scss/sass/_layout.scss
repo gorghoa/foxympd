@@ -1,4 +1,6 @@
-layout {
+body{
+    display:flex;
+    flex:columns;
 
 }
 section[role=network-status]  {
@@ -46,6 +48,7 @@ section[role=main] {
     margin-top:2rem;
     margin-bottom:4rem;
     padding:0 1rem;
+    overflow:hidden;
 }
 
 body {

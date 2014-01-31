@@ -69,6 +69,8 @@ try{
         initialize_mpd:function() {
             registry.mpd=new MPD();
 
+            registry.mpd.status();
+
             registry.mpd.on('player_changed',function() {
                     lastSong = registry.mpd.currentsong();
             });

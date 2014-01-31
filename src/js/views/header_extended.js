@@ -43,6 +43,15 @@ define([
                 self.hide();
             });
 
+            app.registry.mpd.on('open',function(){
+                    try{
+                        var stream_url = (app.registry.current_connection.get('http_stream_active') && app.registry.current_connection.get('http_stream_url'))?app.registry.current_connection.get('http_stream_url'):null;
+                        self.render();
+                    } catch(e) {
+                        console.log(e.message,e.fileName,e.lineNumber);
+                    }
+            });
+
             app.registry.mpd.on('player_changed',function(){
                 app.get_last_song().done(function(result){
                         var song = result.data;
@@ -68,7 +77,7 @@ define([
             this.$el.toggleClass('discreet',force);
         },
         render: function() {
-            this.$el.html(tpl());
+            this.$el.html(tpl({http_stream_url:true}));
             this.hide();
             this.delegateEvents();
 
@@ -100,6 +109,7 @@ define([
             var target = $(e.currentTarget);
             var mpd=app.registry.mpd;
 
+            console.log(target.attr('data-action'));
 
             switch (target.attr('data-action')) {
 
@@ -112,6 +122,18 @@ define([
                     mpd.volumeUp();
                     break;
 
+                case 'stream':
+                    var audio =  this.$el.find('#http_stream_player')[0];
+                    console.log('ok',audio.paused);
+                    var t=$(e.target);
+                    if(audio.paused===false) {
+                        t.removeClass('active');
+                        audio.pause();
+                    } else {
+                        t.toggleClass('active',true);
+                        audio.play();
+                    }
+                    break;
 
                 default:
                     throw "should not passing here…";

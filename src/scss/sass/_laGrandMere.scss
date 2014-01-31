@@ -84,8 +84,16 @@ li.list.current .title:before {
 }
 li.list.current {
     text-align:center;
-    -moz-transform:scale(1, 1.3) rotate(2deg);
-    box-shadow: 0px 10px 20px;
+    -moz-transform:scale(1, 1.3) rotate(1deg);
+    transform:scale(1, 1.3) rotate(1deg);
+    border-radius:1em;
+    box-shadow: inset 0px 0px 1em #CCC;
+    width:90%;
+    border:3px double #000;
+    background:#FFF;
+    padding:0.5em;
+    overflow:hidden;
+
 }
 
 li.list .artist {
@@ -186,12 +194,14 @@ li.list img.artist{
 }
 li.list.current img.artist {
     display:block;
+    display:none;
     position:absolute;
     max-height:5rem;
     max-width:5rem;
     right:-3rem;
     bottom:-1rem;
     -moz-transform:rotate(-6deg);
+    transform:rotate(-6deg);
 }
 
 .hints {

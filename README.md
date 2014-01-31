@@ -55,6 +55,17 @@ Install dependencies :
 Release notes
 =============
 
+1.0.1
+
+#. Fix the http stream flux
+#. Move the shuffle playlist button to menu, and ask for confirmation before shuffle it ;)
+#. Move the play random to the bottom toolbar
+#. Move the http stream activator to the extended play pannel
+
+1.0.0
+
+#. First acceptable release
+
 0.0.4
 
 #. cover support (settingable)

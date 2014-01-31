@@ -39,21 +39,12 @@ try{
             app.registry.mpd.on('player_changed',function(){
                     self.updateToolbar();
             });
-            app.registry.mpd.on('open',function(){
-                    try{
-
-                        var stream_url = (app.registry.current_connection.get('http_stream_active') && app.registry.current_connection.get('http_stream_url'))?app.registry.current_connection.get('http_stream_url'):null;
-                        self.render();
-                    } catch(e) {
-                        console.log(e.message,e.fileName,e.lineNumber);
-                    }
+            app.registry.mpd.on('options_changed',function(){
                     self.updateToolbar();
             });
         },
-        render: function(http_stream_url) {
-            var http_stream_url = http_stream_url || null;
-            var data={http_stream_url:http_stream_url,isRandom:app.registry.mpd.isRandom()};
-
+        render: function() {
+            var data={};
             this.$el.html(tpl(data));
         },
         events : {
@@ -64,7 +55,14 @@ try{
             var self=this;
             var txt=(app.registry.mpd.statusdata.state==="play")?"pause":"playmedia";
             this.$el.find("button[role=mpd-control][data-action=playpause]").text(txt);
-            this.$el.find("button[role=mpd-control][data-action=stream]").attr('disabled',false);
+
+            app.registry.mpd.status().done(function() {
+                if(app.registry.mpd.isRandom()) {
+                    self.$el.find("button[role=mpd-control][data-action=randomize]").toggleClass('active',true);//,false);
+                } else {
+                    self.$el.find("button[role=mpd-control][data-action=randomize]").removeClass('active');//,false);
+                }
+            });
             
         },
 
@@ -84,18 +82,6 @@ try{
                     mpd.togglePlayPause();
                     break;
 
-                case 'stream':
-                    var audio =  this.$el.find('#http_stream_player')[0];
-                    console.log('ok',audio.paused);
-                    var t=$(e.target);
-                    if(audio.paused===false) {
-                        t.removeClass('active');
-                        audio.pause();
-                    } else {
-                        t.toggleClass('active',true);
-                        audio.play();
-                    }
-                    break;
 
                 case 'next':
                     mpd.next();

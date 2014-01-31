@@ -24,9 +24,16 @@
     </div>
 
     <h4>HTTP Stream</h4>
+        <p class="help">
+        Http stream will allow you to output mpd http stream directly to the device speakers/headphones.
+        
+        In order to use correctly this functionnality, make sure to have activate the http stream within your mpd server.
+
+        Otherwise, you’ll just be frustrated ;).
+        </p>
     <div>
-        <label checked="<%= (model.get('http_stream_active'))?'checked':'' %>" for="http_stream_active">http stream active ?</label>
-        <input type="checkbox"  name="http_stream_active" id="http_stream_active" />
+        <label for="http_stream_active">http stream active ?</label>
+        <input type="checkbox" <%= (model.get('http_stream_active',false)===true)?'checked':'' %>  name="http_stream_active" id="http_stream_active" />
     </div><div>
         <label for="http_stream_url">http stream url</label>
         <input type="text"  name="http_stream_url" id="http_stream_url" value="<%= model.get('http_stream_url') %>" />

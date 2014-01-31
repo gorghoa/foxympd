@@ -57,6 +57,8 @@ define([
             $('section[role=network-status]').hide();
             var self=this;
 
+
+            console.log(this.model.attributes);
             var data={model:this.model,update:this.update};
 
             var done;
@@ -121,10 +123,21 @@ define([
             this.model.set('host',this.$el.find('input[name=host]').val());
             this.model.set('port',this.$el.find('input[name=port]').val());
             this.model.set('password',this.$el.find('input[name=password]').val());
-            this.model.set('http_stream_active',this.$el.find('input[name=http_stream_active]').prop('checked'));
+
+            $http_stream_checkbox = this.$el.find('input[name=http_stream_active]');
+            
+
+            var value = ($http_stream_checkbox.attr('checked'))?true:false;
+            console.log('WTFTFTFT',$http_stream_checkbox.attr('checked'),value);
+            
+            this.model.set('http_stream_active',value);
             var stream_url = this.$el.find('input[name=http_stream_url]').val() || null;
             this.model.set('http_stream_url',stream_url);
+
+            console.log(this.model.attributes);
             this.model.save();
+            console.log(this.model.attributes);
+            
             app.mpdconnect(this.model);
             $('[role=toolbar]').show();
             app.registry.app_router.navigate('/',{trigger:true});
