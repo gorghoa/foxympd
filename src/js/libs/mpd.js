@@ -674,7 +674,7 @@
                 return dfd.promise();
             }
                 
-            var vol =self.statusdata.volume-10;
+            var vol =self.statusdata.volume-5;
             if(vol<0) vol=0;
 
             return this.send("setvol "+ vol +"\n",options);
@@ -689,7 +689,7 @@
                 dfd.fail();
                 return dfd.promise();
             }
-            var vol =self.statusdata.volume+10;
+            var vol =self.statusdata.volume+5;
             if(vol>100) vol=100;
             return this.send("setvol "+ vol +"\n",options);
 
