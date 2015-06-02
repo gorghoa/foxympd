@@ -7,6 +7,6 @@
 </div>
 <img role="cover" src="/imgs/backcover.png" />
     <% if (http_stream_url) { %>
-        <audio src="<%= http_stream_url %>" id="http_stream_player"></audio>
+        <audio mozaudiochannel="content"  src="<%= http_stream_url %>" id="http_stream_player"></audio>
         <button class="control lsf" role="mpd-control" data-action="stream" >music</button>
     <% } %> 
